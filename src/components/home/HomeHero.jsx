@@ -6,25 +6,6 @@ import Link from "next/link";
 import "./HomeHero.css";
 
 
-const vehicleOptions = {
-  Toyota: ["Camry", "Corolla", "RAV4", "Land Cruiser"],
-  Honda: ["Accord", "Civic", "CR-V", "Pilot"],
-  Mercedes: ["C-Class", "E-Class", "GLC", "GLE"],
-  BMW: ["3 Series", "5 Series", "X3", "X5"],
-  Hyundai: ["Elantra", "Sonata", "Tucson", "Santa Fe"],
-  Kia: ["Cerato", "Sportage", "Sorento"],
-  Nissan: ["Altima", "Rogue", "Sentra"],
-};
-
-const vehicleTypes = [
-  "Sedan",
-  "SUV",
-  "Hatchback",
-  "Pickup",
-  "Coupe",
-  "Van",
-];
-
 const heroImages = [
   "/images/branding/unsplash1.jpg",
   "/images/branding/unsplash2.jpg",
@@ -34,9 +15,7 @@ const heroImages = [
 ];
 
 export default function HomeHero() {
-  const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
-  const [type, setType] = useState("");
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -49,10 +28,7 @@ export default function HomeHero() {
     return () => clearInterval(interval);
   }, []);
 
-  function handleMakeChange(event) {
-    setMake(event.target.value);
-    setModel("");
-  }
+
 
   return (
     <section className="home-hero" aria-labelledby="hero-title">

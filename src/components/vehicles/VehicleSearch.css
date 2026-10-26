@@ -1,0 +1,122 @@
+
+.vehicle-search-section {
+  margin: 32px 0 44px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(16, 27, 43, 0.06);
+}
+
+.vehicle-search-form {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(180px, 0.9fr);
+  gap: 18px;
+  align-items: end;
+}
+
+.vehicle-search-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 8px;
+}
+
+.vehicle-search-field label {
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.vehicle-search-field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #101b2b;
+  font-size: 0.95rem;
+}
+
+.vehicle-search-field select:focus-visible,
+.vehicle-search-button:focus-visible,
+.vehicle-search-reset:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+.vehicle-search-field select:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.vehicle-search-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  align-items: stretch;
+}
+
+.vehicle-search-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  background: #f59e0b;
+  color: #101b2b;
+  font-weight: 800;
+  transition: background-color 0.2s ease;
+}
+
+.vehicle-search-button:hover {
+  background: #fbbf24;
+}
+
+.vehicle-search-reset {
+  color: #475569;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vehicle-search-reset:hover {
+  color: #101b2b;
+}
+
+@media (max-width: 950px) {
+  .vehicle-search-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .vehicle-search-section {
+    padding: 18px;
+    margin: 24px 0 32px;
+  }
+
+  .vehicle-search-form {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-search-button {
+    transition: none;
+  }
+}

@@ -56,14 +56,14 @@
   margin: auto;
   padding: 160px 0 90px;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr);;
   align-items: center;
   gap: 70px;
   z-index: 3;
 }
 
 .hero-content {
-  max-width: 660px;
+  max-width: 760px;
 }
 
 .hero-eyebrow,

@@ -1,56 +1,110 @@
 
+import { Suspense } from "react";
 import VehicleCard from "@/components/vehicles/VehicleCard";
-import { getAvailableVehicles } from "@/data/vehicles";
+import VehicleSearch from "@/components/vehicles/VehicleSearch";
+
+import {
+  searchVehicles,
+  getVehicleSearchOptions,
+} from "@/lib/vehicle-search";
+
 import "./cars.css";
 
 export const metadata = {
   title: "Browse Cars | Ghana Auto",
-  description:
-    "Explore available vehicle listings at Ghana Auto.",
+  description: "Explore available vehicle listings at Ghana Auto.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
-export default function CarsPage() {
-  const vehicles = getAvailableVehicles();
+// This component runs when request parameters are available.
+async function VehicleResults({ searchParams }) {
+  const filters = await searchParams;
 
+  const vehicles = searchVehicles(filters);
+  const searchOptions = getVehicleSearchOptions();
+
+  const hasFilters = ["make", "model", "type"].some((key) => {
+    const value = filters[key];
+
+    return (
+      (typeof value === "string" && value.trim() !== "") ||
+      Array.isArray(value)
+    );
+  });
+
+  return (
+    <>
+      <VehicleSearch
+        key={JSON.stringify(filters)}
+        searchOptions={searchOptions}
+        initialFilters={filters}
+      />
+
+      <div className="cars-toolbar">
+        <h2>
+          {hasFilters ? "Search Results" : "Available Vehicles"}
+        </h2>
+
+        <span>
+          {vehicles.length}{" "}
+          {vehicles.length === 1 ? "vehicle" : "vehicles"} found
+        </span>
+      </div>
+
+      {vehicles.length > 0 ? (
+        <div className="vehicle-grid">
+          {vehicles.map((vehicle) => (
+            <VehicleCard
+              key={vehicle.id}
+              vehicle={vehicle}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="cars-empty">
+          <h2>No matching vehicles found</h2>
+          <p>Try another make, model, or vehicle type.</p>
+        </div>
+      )}
+
+      <p className="cars-demo-notice">
+        Demonstration inventory — vehicle details,
+        prices, and availability are fictional.
+      </p>
+    </>
+  );
+}
+
+// This page can provide a static shell during prerendering.
+export default function CarsPage({ searchParams }) {
   return (
     <section className="cars-page">
       <div className="cars-container">
         <div className="cars-heading">
-          <p className="cars-eyebrow">EXPLORE OUR COLLECTION</p>
+          <p className="cars-eyebrow">
+            EXPLORE OUR COLLECTION
+          </p>
 
           <h1>Find Your Next Vehicle</h1>
 
           <p>
-            Browse our selection of vehicles and discover
-            options that match your needs.
+            Search our vehicle collection by make,
+            model, or vehicle type.
           </p>
         </div>
 
-        <div className="cars-toolbar">
-          <h2>Available Vehicles</h2>
-          <span>{vehicles.length} vehicles</span>
-        </div>
-
-        {vehicles.length > 0 ? (
-          <div className="vehicle-grid">
-            {vehicles.map((vehicle) => (
-              <VehicleCard
-                key={vehicle.id}
-                vehicle={vehicle}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="cars-empty">
-            <h2>No vehicles available</h2>
-            <p>Please check back for new listings.</p>
-          </div>
-        )}
-
-        <p className="cars-demo-notice">
-          Demonstration inventory — vehicle details,
-          pricing, and availability are fictional.
-        </p>
+        <Suspense
+          fallback={
+            <div className="cars-loading" role="status">
+              Loading vehicle inventory...
+            </div>
+          }
+        >
+          <VehicleResults searchParams={searchParams} />
+        </Suspense>
       </div>
     </section>
   );

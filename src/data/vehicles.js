@@ -17,7 +17,7 @@ export const vehicles = [
     location: "Accra",
     status: "AVAILABLE",
     featured: true,
-    images: [],
+    images: ["/images/vehicles/toyota-rav4-2019.jpg"],
   },
   {
     id: "GA-002",
@@ -35,7 +35,7 @@ export const vehicles = [
     location: "Tema",
     status: "AVAILABLE",
     featured: true,
-    images: [],
+    images: ["/images/vehicles/honda-accord-2018.jpg"],
   },
   {
     id: "GA-003",
@@ -53,7 +53,7 @@ export const vehicles = [
     location: "Kumasi",
     status: "AVAILABLE",
     featured: true,
-    images: [],
+    images: ["/images/vehicles/hyundai-tucson-2020.jpg"],
   },
   {
     id: "GA-004",
@@ -71,7 +71,7 @@ export const vehicles = [
     location: "Accra",
     status: "AVAILABLE",
     featured: false,
-    images: [],
+    images: ["/images/vehicles/toyota-corolla-2017.jpg"],
   },
   {
     id: "GA-005",
@@ -89,7 +89,7 @@ export const vehicles = [
     location: "Accra",
     status: "AVAILABLE",
     featured: true,
-    images: [],
+    images: ["/images/vehicles/kia-sportage-2021.jpg"],
   },
   {
     id: "GA-006",
@@ -107,7 +107,7 @@ export const vehicles = [
     location: "Accra",
     status: "SOLD",
     featured: false,
-    images: [],
+    images: ["/images/vehicles/nissan-rogue-2019.jpg"],
   },
 ];
 

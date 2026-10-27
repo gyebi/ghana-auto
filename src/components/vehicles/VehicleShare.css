@@ -1,0 +1,44 @@
+
+.vehicle-share {
+  margin-top: 12px;
+}
+
+.vehicle-share-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 18px;
+  border: 1px solid #101b2b;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #101b2b;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.vehicle-share-button:hover {
+  background: #f1f5f9;
+}
+
+.vehicle-share-button:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+.vehicle-share-message {
+  margin: 10px 0 0;
+  color: #475569;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-share-button {
+    transition: none;
+  }
+}

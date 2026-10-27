@@ -59,11 +59,12 @@ export default function VehicleCard({ vehicle }) {
           {vehicle.location}, Ghana
         </p>
 
+
         <Link
           className="vehicle-card-button"
-          href={`/contact?vehicle=${encodeURIComponent(vehicle.id)}`}
+          href={`/cars/${encodeURIComponent(vehicle.slug)}`}
         >
-          Enquire About Vehicle
+          View Vehicle Details
           <span aria-hidden="true">→</span>
         </Link>
       </div>

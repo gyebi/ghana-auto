@@ -1,0 +1,144 @@
+
+
+.vehicle-gallery {
+  width: 100%;
+  min-width: 0;
+}
+
+.gallery-main,
+.gallery-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e2e8f0;
+}
+
+.gallery-main-image,
+.gallery-thumb-image {
+  object-fit: cover;
+}
+
+.gallery-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.gallery-thumbnail {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #e2e8f0;
+  cursor: pointer;
+}
+
+.gallery-thumbnail.active {
+  border-color: #f59e0b;
+}
+
+.gallery-thumbnail:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+.gallery-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  text-align: center;
+}
+
+.gallery-placeholder span {
+  font-size: 3.5rem;
+}
+
+@media (max-width: 600px) {
+  .gallery-thumbnails {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+
+/* Previous and Next gallery controls */
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: rgba(16, 27, 43, 0.78);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.gallery-arrow span {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.gallery-arrow:hover {
+  background: #f59e0b;
+  color: #101b2b;
+}
+
+.gallery-arrow-prev {
+  left: 18px;
+}
+
+.gallery-arrow-next {
+  right: 18px;
+}
+
+.gallery-arrow:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+.gallery-counter {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  z-index: 2;
+  padding: 7px 13px;
+  border-radius: 20px;
+  background: rgba(16, 27, 43, 0.78);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .gallery-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gallery-arrow-prev {
+    left: 10px;
+  }
+
+  .gallery-arrow-next {
+    right: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-arrow {
+    transition: none;
+  }
+}

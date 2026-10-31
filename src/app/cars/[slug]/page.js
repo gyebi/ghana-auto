@@ -1,14 +1,10 @@
 
-
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
-import {
-  vehicles,
-  getVehicleBySlug,
-} from "@/data/vehicles";
+import { getPublicVehicleBySlug } from "@/lib/db/vehicle-repository";
 import {
   formatVehiclePrice,
   formatMileage,
@@ -27,34 +23,29 @@ export const metadata = {
   },
 };
 
-// Known demo vehicles can be prerendered.
-export function generateStaticParams() {
-  return vehicles
-    .filter((vehicle) => vehicle.status === "AVAILABLE")
-    .map((vehicle) => ({
-      slug: vehicle.slug,
-    }));
-}
-
 async function VehicleDetailContent({ params }) {
   const { slug } = await params;
+  const vehicle = await getPublicVehicleBySlug(slug);
 
-  if (
-    typeof slug !== "string" ||
-    slug.length > 120 ||
-    !/^[a-z0-9-]+$/.test(slug)
-  ) {
-    notFound();
-  }
-
-  const vehicle = getVehicleBySlug(slug);
-
-  // Don't advertise sold or unavailable vehicles.
-  if (!vehicle || vehicle.status !== "AVAILABLE") {
-    notFound();
-  }
+  if (!vehicle) notFound();
 
   const title = getVehicleTitle(vehicle);
+  const isImportOrder = vehicle.inventoryType === "IMPORT_ORDER";
+  const isInTransit = vehicle.inventoryType === "IN_TRANSIT";
+  const availability = isImportOrder
+    ? "Available to Order"
+    : isInTransit
+      ? "In Transit"
+      : "Available";
+  const leadTime =
+    vehicle.estimatedLeadTimeMinDays != null &&
+    vehicle.estimatedLeadTimeMaxDays != null
+      ? `${vehicle.estimatedLeadTimeMinDays}–${vehicle.estimatedLeadTimeMaxDays} days`
+      : vehicle.estimatedLeadTimeMinDays != null
+        ? `from ${vehicle.estimatedLeadTimeMinDays} days`
+        : vehicle.estimatedLeadTimeMaxDays != null
+          ? `up to ${vehicle.estimatedLeadTimeMaxDays} days`
+          : null;
 
   const specifications = [
     ["Make", vehicle.make],
@@ -65,7 +56,16 @@ async function VehicleDetailContent({ params }) {
     ["Transmission", vehicle.transmission],
     ["Fuel", vehicle.fuelType],
     ["Mileage", formatMileage(vehicle.mileage)],
-    ["Location", `${vehicle.location}, Ghana`],
+    [
+      "Location",
+      isImportOrder
+        ? "Not currently in local inventory"
+        : isInTransit
+          ? "Currently in transit"
+          : vehicle.location
+            ? `${vehicle.location}, Ghana`
+            : null,
+    ],
     ["Stock ID", vehicle.id],
   ];
 
@@ -82,7 +82,7 @@ async function VehicleDetailContent({ params }) {
       <div className="vehicle-detail-heading">
         <div>
           <p className="vehicle-detail-eyebrow">
-            AVAILABLE VEHICLE
+            {isImportOrder ? "IMPORT ORDER" : availability.toUpperCase()}
           </p>
           <h1>{title}</h1>
           <p>{vehicle.condition} · {vehicle.bodyType}</p>
@@ -126,8 +126,25 @@ async function VehicleDetailContent({ params }) {
             </p>
 
             <span className="vehicle-availability">
-              Available
+              {availability}
             </span>
+
+            {isImportOrder && (
+              <p className="vehicle-availability-note">
+                This vehicle is available to order and is not
+                currently in local stock.
+                {leadTime && (
+                  <> Estimated lead time: {leadTime}, subject to confirmation.</>
+                )}
+              </p>
+            )}
+
+            {isInTransit && (
+              <p className="vehicle-availability-note">
+                This vehicle is in transit. Arrival timing is an
+                estimate and subject to confirmation.
+              </p>
+            )}
 
             <div className="vehicle-quick-specs">
               <p><strong>Year:</strong> {vehicle.year}</p>
@@ -141,7 +158,11 @@ async function VehicleDetailContent({ params }) {
               </p>
               <p>
                 <strong>Location:</strong>{" "}
-                {vehicle.location}
+                {isImportOrder
+                  ? "Not currently in local inventory"
+                  : isInTransit
+                    ? "Currently in transit"
+                    : vehicle.location ?? "Not specified"}
               </p>
             </div>
 
@@ -155,8 +176,8 @@ async function VehicleDetailContent({ params }) {
 
 
             <p className="vehicle-detail-disclaimer">
-              Demo listing only. Prices, specifications,
-              and availability are fictional.
+              Demonstration listing only. Prices, specifications,
+              and availability require confirmation.
             </p>
           </div>
         </aside>

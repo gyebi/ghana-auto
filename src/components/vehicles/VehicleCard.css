@@ -88,6 +88,13 @@
   font-weight: 800;
 }
 
+.vehicle-card-availability {
+  margin: -8px 0 18px;
+  color: #166534;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .vehicle-card-specs {
   display: flex;
   flex-wrap: wrap;
@@ -142,4 +149,3 @@
     transform: none;
   }
 }
-

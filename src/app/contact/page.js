@@ -1,10 +1,11 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import { getAvailableVehicles } from "@/data/vehicles";
+import { getPublicVehicles } from "@/lib/db/vehicle-repository";
+import { isValidPublicStockCode } from "@/lib/db/public-vehicle-policy.mjs";
+import { getVehicleEnquiryContext } from "@/lib/vehicle-enquiry";
 import {
   formatVehiclePrice,
-  getVehicleTitle,
 } from "@/lib/vehicle-format";
 
 import "./contact.css";
@@ -18,18 +19,20 @@ async function ContactContent({ searchParams }) {
   const params = await searchParams;
   const stockId = params.vehicle;
 
+  const publicVehicles = await getPublicVehicles();
   const vehicle =
-    typeof stockId === "string" && stockId.length <= 40
-      ? getAvailableVehicles().find(
+    isValidPublicStockCode(stockId)
+      ? publicVehicles.find(
           (item) => item.id === stockId
         )
       : undefined;
+  const enquiry = getVehicleEnquiryContext(vehicle);
 
   return (
     <section className="page-container">
       <h1>Contact Ghana Auto</h1>
 
-      {vehicle ? (
+      {enquiry ? (
         <div className="contact-vehicle">
           <h2>Your Vehicle Enquiry</h2>
 
@@ -37,18 +40,24 @@ async function ContactContent({ searchParams }) {
             You&apos;re interested in:
           </p>
 
-          <h3>{getVehicleTitle(vehicle)}</h3>
+          <h3>{enquiry.title}</h3>
 
           <p>
-            <strong>Stock ID:</strong> {vehicle.id}
+            <strong>Stock ID:</strong> {enquiry.stockCode}
           </p>
 
           <p>
             <strong>Price:</strong>{" "}
-            {formatVehiclePrice(vehicle.price)}
+            {formatVehiclePrice(enquiry.price)}
           </p>
 
-          <Link href={`/cars/${vehicle.slug}`}>
+          {enquiry.type === "IMPORT_REQUEST" && (
+            <p>
+              <strong>Enquiry type:</strong> Import / sourcing request
+            </p>
+          )}
+
+          <Link href={`/cars/${enquiry.slug}`}>
             ← View Vehicle Again
           </Link>
         </div>

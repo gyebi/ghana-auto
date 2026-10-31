@@ -6,16 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test tests/*.mjs",
+    "test:integration": "node --test tests/integration/*.integration.mjs"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "dotenv": "^18.0.9",
     "firebase": "^13.1.0",
     "next": "16.4.3",
+    "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "eslint": "^9",
-    "eslint-config-next": "16.4.3"
+    "eslint-config-next": "16.4.3",
+    "prisma": "^7.10.1",
+    "tsx": "^4.23.15"
   }
 }

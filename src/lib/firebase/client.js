@@ -1,5 +1,10 @@
 
 import { getApp, getApps, initializeApp } from "firebase/app";
+import {
+  getAuth,
+  initializeAuth,
+  inMemoryPersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -29,4 +34,23 @@ export function getFirebaseClientApp() {
 
 export function getClientFirestore() {
   return getFirestore(getFirebaseClientApp());
+}
+
+// Staff sessions are represented by the server-issued, HTTP-only cookie. Keep
+// the short-lived browser credential in memory only while exchanging its ID
+// token; do not let Firebase restore it from local or session storage.
+export function getFirebaseClientAuth() {
+  const app = getFirebaseClientApp();
+
+  try {
+    return initializeAuth(app, {
+      persistence: inMemoryPersistence,
+    });
+  } catch (error) {
+    if (error?.code === "auth/already-initialized") {
+      return getAuth(app);
+    }
+
+    throw error;
+  }
 }

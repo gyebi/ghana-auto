@@ -1,5 +1,10 @@
 
 import Link from "next/link";
+import { Suspense } from "react";
+
+import StaffLogin from "@/components/admin/StaffLogin";
+import StaffSignOut from "@/components/admin/StaffSignOut";
+import { getCurrentStaffSession } from "@/lib/auth/staff-session";
 import "./admin.css";
 
 export const metadata = {
@@ -25,7 +30,7 @@ const statistics = [
   { label: "New Enquiries", value: "12" },
 ];
 
-export default function AdminPage() {
+function AdminDashboard({ staffUser }) {
   return (
     <div className="admin-dashboard">
       <aside className="admin-sidebar">
@@ -67,14 +72,21 @@ export default function AdminPage() {
           </div>
 
           <span className="admin-demo-label">
-            Prototype Only
+            Demonstration data
           </span>
         </div>
 
         <div className="admin-notice" role="note">
-          This is a demonstration interface using sample
-          information. Authentication, live inventory, and
-          management actions are not enabled.
+          Dashboard statistics are demonstration data until live
+          administrative queries are implemented. Management
+          actions are not enabled in this checkpoint.
+        </div>
+
+        <div className="admin-staff-bar">
+          <span>
+            Signed in as {staffUser.displayName || staffUser.email} ({staffUser.role})
+          </span>
+          <StaffSignOut />
         </div>
 
         <section
@@ -113,5 +125,39 @@ export default function AdminPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+function AdminLoading() {
+  return (
+    <section className="admin-login" aria-live="polite">
+      <div className="admin-login-card">
+        <p className="admin-eyebrow">STAFF ACCESS</p>
+        <h1>Ghana Auto Administration</h1>
+        <p>Checking your staff session…</p>
+      </div>
+    </section>
+  );
+}
+
+async function AdminEntry() {
+  // This is intentionally below Suspense: Cache Components requires the
+  // request-time session check to stream rather than enter a shared shell.
+  // The helper rechecks Firebase revocation and Neon staff state on each
+  // protected render.
+  const session = await getCurrentStaffSession();
+
+  if (!session) {
+    return <StaffLogin />;
+  }
+
+  return <AdminDashboard staffUser={session.staffUser} />;
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<AdminLoading />}>
+      <AdminEntry />
+    </Suspense>
   );
 }

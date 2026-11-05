@@ -1,41 +1,55 @@
+
 import "server-only";
 
-import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
+import {
+  applicationDefault,
+  cert,
+  getApps,
+  initializeApp,
+} from "firebase-admin/app";
+
 import { getAuth } from "firebase-admin/auth";
 
 function getServiceAccountCredential() {
   const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
-  const configuredValues = [projectId, clientEmail, privateKey];
 
-  if (configuredValues.some(Boolean)) {
-    if (configuredValues.some((value) => !value)) {
-      throw new Error("Firebase Admin credentials are incomplete.");
+  // Explicit service-account authentication is used locally
+  // when both credential fields are provided.
+  if (clientEmail || privateKey) {
+    if (!projectId || !clientEmail || !privateKey) {
+      throw new Error(
+        "Firebase Admin service-account credentials are incomplete."
+      );
     }
 
     return cert({
       projectId,
       clientEmail,
-      // Environment providers commonly preserve newlines as literal `\\n`.
       privateKey: privateKey.replace(/\\n/g, "\n"),
     });
   }
 
-  // This supports managed runtimes that use Application Default Credentials
-  // without making credentials part of the application bundle.
+  // Managed hosting uses Application Default Credentials.
   return applicationDefault();
 }
 
 export function getFirebaseAdminApp() {
-  const existingApp = getApps().find((app) => app.name === "[DEFAULT]");
-
-  return (
-    existingApp ??
-    initializeApp({
-      credential: getServiceAccountCredential(),
-    })
+  const existingApp = getApps().find(
+    (app) => app.name === "[DEFAULT]"
   );
+
+  if (existingApp) {
+    return existingApp;
+  }
+
+  return initializeApp({
+    credential: getServiceAccountCredential(),
+    ...(process.env.FIREBASE_ADMIN_PROJECT_ID
+      ? { projectId: process.env.FIREBASE_ADMIN_PROJECT_ID }
+      : {}),
+  });
 }
 
 export function getFirebaseAdminAuth() {

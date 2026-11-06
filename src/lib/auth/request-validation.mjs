@@ -9,7 +9,35 @@ export function isSameOriginRequest(request) {
   if (!origin) return false;
 
   try {
-    return new URL(origin).origin === new URL(request.url).origin;
+    const suppliedOrigin = new URL(origin);
+
+    // The Origin header must contain an origin only.
+    if (
+      origin !== suppliedOrigin.origin ||
+      suppliedOrigin.username ||
+      suppliedOrigin.password
+    ) {
+      return false;
+    }
+
+    const configuredOrigin = process.env.STAFF_AUTH_ALLOWED_ORIGIN;
+
+    if (configuredOrigin) {
+      const approved = new URL(configuredOrigin);
+
+      // Reject invalid or insecure production configuration.
+      if (
+        approved.protocol !== "https:" ||
+        configuredOrigin !== approved.origin
+      ) {
+        return false;
+      }
+
+      return origin === configuredOrigin;
+    }
+
+    // Local development: preserve the existing same-origin check.
+    return origin === new URL(request.url).origin;
   } catch {
     return false;
   }

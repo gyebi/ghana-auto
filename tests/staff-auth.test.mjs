@@ -105,3 +105,75 @@ test("session payload validation constrains JSON shape and request size", async 
 
   assert.deepEqual(oversized, { ok: false, reason: "too_large" });
 });
+
+
+test("production origin validation works behind a reverse proxy", () => {
+  const envKey = "STAFF_AUTH_ALLOWED_ORIGIN";
+  const previousValue = process.env[envKey];
+
+  const productionOrigin =
+    "https://ghana-auto--ghana-auto.us-east4.hosted.app";
+
+  const makeRequest = (origin) =>
+    new Request("http://internal-proxy:8080/api/auth/session", {
+      headers: origin ? { origin } : {},
+    });
+
+  try {
+    process.env[envKey] = productionOrigin;
+
+    // Accept the approved public origin even if the
+    // internal request URL differs.
+    assert.equal(
+      isSameOriginRequest(makeRequest(productionOrigin)),
+      true
+    );
+
+    // Reject unapproved origins.
+    assert.equal(
+      isSameOriginRequest(makeRequest("https://attacker.example")),
+      false
+    );
+
+    // Reject missing origins.
+    assert.equal(
+      isSameOriginRequest(makeRequest(null)),
+      false
+    );
+
+    // Reject malformed origins.
+    assert.equal(
+      isSameOriginRequest(makeRequest("not-a-valid-origin")),
+      false
+    );
+
+    // Reject origins containing paths.
+    assert.equal(
+      isSameOriginRequest(
+        makeRequest(`${productionOrigin}/admin`)
+      ),
+      false
+    );
+
+    // Invalid production configuration must fail closed.
+    process.env[envKey] = "http://insecure.example";
+
+    assert.equal(
+      isSameOriginRequest(makeRequest(productionOrigin)),
+      false
+    );
+
+    process.env[envKey] = `${productionOrigin}/admin`;
+
+    assert.equal(
+      isSameOriginRequest(makeRequest(productionOrigin)),
+      false
+    );
+  } finally {
+    if (previousValue === undefined) {
+      delete process.env[envKey];
+    } else {
+      process.env[envKey] = previousValue;
+    }
+  }
+});

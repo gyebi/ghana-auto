@@ -1,0 +1,220 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------
+// ENUMS
+// ------------------------------------------
+
+enum VehicleStatus {
+  DRAFT
+  AVAILABLE
+  RESERVED
+  SOLD
+  ARCHIVED
+}
+
+enum InventoryType {
+  LOCAL_STOCK
+  IMPORT_ORDER
+  IN_TRANSIT
+}
+
+enum StaffRole {
+  ADMIN
+  STAFF
+}
+
+enum EnquiryType {
+  VEHICLE_ENQUIRY
+  IMPORT_REQUEST
+  GENERAL_ENQUIRY
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  IN_PROGRESS
+  CLOSED
+}
+
+// ------------------------------------------
+// VEHICLES
+// ------------------------------------------
+
+model Vehicle {
+  id        String @id @default(cuid())
+  stockCode String @unique
+  slug      String @unique
+
+  make  String
+  model String
+  year  Int
+
+  price     Decimal? @db.Decimal(14, 2)
+  currency  String   @default("GHS") @db.VarChar(3)
+  showPrice Boolean  @default(true)
+
+  bodyType     String
+  condition    String
+  transmission String
+  fuelType     String
+  mileage      Int?
+  location     String?
+
+  description String? @db.Text
+  featured    Boolean @default(false)
+  published   Boolean @default(false)
+
+  status        VehicleStatus @default(DRAFT)
+  inventoryType InventoryType @default(LOCAL_STOCK)
+
+  // Import and shipping information
+  originCountry            String?
+  estimatedLeadTimeMinDays Int?
+  estimatedLeadTimeMaxDays Int?
+  estimatedArrivalDate     DateTime?
+
+  shippingCostEstimate    Decimal?  @db.Decimal(14, 2)
+  clearingCostEstimate    Decimal?  @db.Decimal(14, 2)
+  otherImportCostEstimate Decimal?  @db.Decimal(14, 2)
+  importCurrency          String?   @db.VarChar(3)
+  importNotes             String?   @db.Text
+  estimateUpdatedAt       DateTime?
+
+  // Relationships
+  images    VehicleImage[]
+  enquiries Enquiry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, published])
+  @@index([inventoryType])
+  @@index([make, model])
+  @@index([featured])
+}
+
+// ------------------------------------------
+// VEHICLE IMAGES
+// ------------------------------------------
+
+model VehicleImage {
+  id String @id @default(cuid())
+
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  cloudinaryPublicId String? @unique
+  imageUrl           String  @db.Text
+  altText            String?
+
+  position Int     @default(0)
+  isCover  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([vehicleId, position])
+}
+
+// ------------------------------------------
+// STAFF USERS
+// ------------------------------------------
+
+model StaffUser {
+  id          String  @id @default(cuid())
+  firebaseUid String  @unique
+  email       String  @unique
+  displayName String?
+
+  role   StaffRole @default(STAFF)
+  active Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ------------------------------------------
+// CUSTOMER ENQUIRIES
+// ------------------------------------------
+
+model Enquiry {
+  id String @id @default(cuid())
+
+  type   EnquiryType   @default(GENERAL_ENQUIRY)
+  status EnquiryStatus @default(NEW)
+
+  customerName  String
+  customerEmail String?
+  customerPhone String?
+  message       String? @db.Text
+
+  vehicleId String?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  // Preserve listing context even if it changes
+  vehicleStockCodeSnapshot String?
+  vehicleTitleSnapshot     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vehicleId])
+  @@index([status, createdAt])
+  @@index([type])
+}
+
+// ------------------------------------------
+// DEALERSHIP SETTINGS
+// ------------------------------------------
+
+model SiteSettings {
+  id String @id @default("default")
+
+  businessName String  @default("Ghana Auto")
+  tagline      String?
+
+  phone    String?
+  whatsapp String?
+  email    String?
+
+  address String? @db.Text
+  city    String?
+  country String  @default("Ghana")
+
+  facebookUrl  String?
+  instagramUrl String?
+  tiktokUrl    String?
+  youtubeUrl   String?
+
+  updatedAt DateTime @updatedAt
+}
+
+// ------------------------------------------
+// EDITABLE WEBSITE CONTENT
+// ------------------------------------------
+
+model ContentSection {
+  id  String @id @default(cuid())
+  key String @unique
+
+  title    String?
+  subtitle String?
+  body     String? @db.Text
+  imageUrl String? @db.Text
+
+  published Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

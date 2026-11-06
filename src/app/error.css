@@ -1,0 +1,39 @@
+.site-error {
+  display: grid;
+  min-height: 65vh;
+  place-items: center;
+  padding: 48px 24px;
+  background: #f5f7fa;
+  color: #101b2b;
+  text-align: center;
+}
+
+.site-error > div {
+  max-width: 560px;
+}
+
+.site-error h1 {
+  margin: 0 0 14px;
+}
+
+.site-error p {
+  margin: 0 0 24px;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.site-error button {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 6px;
+  background: #f59e0b;
+  color: #101b2b;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.site-error button:hover {
+  background: #fbbf24;
+}

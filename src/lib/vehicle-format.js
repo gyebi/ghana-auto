@@ -9,15 +9,18 @@ const currencyFormatter = new Intl.NumberFormat("en-GH", {
 const numberFormatter = new Intl.NumberFormat("en-GH");
 
 export function formatVehiclePrice(value) {
-  if (
-    typeof value !== "number" ||
-    !Number.isFinite(value) ||
-    value < 0
-  ) {
-    return "Price on request";
+  const numericValue =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && /^\d+(?:\.\d+)?$/.test(value.trim())
+        ? Number(value)
+        : Number.NaN;
+
+  if (!Number.isFinite(numericValue) || numericValue < 0) {
+    return "Price on Request";
   }
 
-  return currencyFormatter.format(value);
+  return currencyFormatter.format(numericValue);
 }
 
 export function formatMileage(value) {

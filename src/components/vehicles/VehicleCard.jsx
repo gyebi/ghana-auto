@@ -11,6 +11,17 @@ import "./VehicleCard.css";
 export default function VehicleCard({ vehicle }) {
   const title = getVehicleTitle(vehicle);
   const image = vehicle.images?.[0];
+  const isImportOrder = vehicle.inventoryType === "IMPORT_ORDER";
+  const isInTransit = vehicle.inventoryType === "IN_TRANSIT";
+  const leadTime =
+    vehicle.estimatedLeadTimeMinDays != null &&
+    vehicle.estimatedLeadTimeMaxDays != null
+      ? `${vehicle.estimatedLeadTimeMinDays}–${vehicle.estimatedLeadTimeMaxDays} days`
+      : vehicle.estimatedLeadTimeMinDays != null
+        ? `from ${vehicle.estimatedLeadTimeMinDays} days`
+        : vehicle.estimatedLeadTimeMaxDays != null
+          ? `up to ${vehicle.estimatedLeadTimeMaxDays} days`
+          : null;
 
   return (
     <article className="vehicle-card">
@@ -48,16 +59,37 @@ export default function VehicleCard({ vehicle }) {
           {formatVehiclePrice(vehicle.price)}
         </p>
 
+        <p className="vehicle-card-availability">
+          {isImportOrder
+            ? "Available to Order"
+            : isInTransit
+              ? "In Transit"
+              : "Available"}
+        </p>
+
         <div className="vehicle-card-specs">
           <span>{vehicle.bodyType}</span>
           <span>{vehicle.transmission}</span>
           <span>{formatMileage(vehicle.mileage)}</span>
         </div>
 
-        <p className="vehicle-card-location">
-          <span aria-hidden="true">📍</span>
-          {vehicle.location}, Ghana
-        </p>
+        {isImportOrder ? (
+          <p className="vehicle-card-location">
+            Available to order — not currently in local stock.
+            {leadTime && <> Estimated lead time: {leadTime}.</>}
+          </p>
+        ) : isInTransit ? (
+          <p className="vehicle-card-location">
+            Currently in transit. Arrival timing is subject to confirmation.
+          </p>
+        ) : (
+          <p className="vehicle-card-location">
+            <span aria-hidden="true">📍</span>
+            {vehicle.location
+              ? `${vehicle.location}, Ghana`
+              : "Location available on request"}
+          </p>
+        )}
 
 
         <Link

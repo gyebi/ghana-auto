@@ -4,9 +4,11 @@ import VehicleCard from "@/components/vehicles/VehicleCard";
 import VehicleSearch from "@/components/vehicles/VehicleSearch";
 
 import {
+  hasVehicleSearchFilters,
   searchVehicles,
   getVehicleSearchOptions,
 } from "@/lib/vehicle-search";
+import { getPublicVehicles } from "@/lib/db/vehicle-repository";
 
 import "./cars.css";
 
@@ -22,18 +24,11 @@ export const metadata = {
 // This component runs when request parameters are available.
 async function VehicleResults({ searchParams }) {
   const filters = await searchParams;
+  const publicVehicles = await getPublicVehicles();
 
-  const vehicles = searchVehicles(filters);
-  const searchOptions = getVehicleSearchOptions();
-
-  const hasFilters = ["make", "model", "type"].some((key) => {
-    const value = filters[key];
-
-    return (
-      (typeof value === "string" && value.trim() !== "") ||
-      Array.isArray(value)
-    );
-  });
+  const vehicles = searchVehicles(publicVehicles, filters);
+  const searchOptions = getVehicleSearchOptions(publicVehicles);
+  const hasFilters = hasVehicleSearchFilters(filters);
 
   return (
     <>

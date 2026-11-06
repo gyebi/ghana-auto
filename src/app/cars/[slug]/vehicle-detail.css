@@ -143,6 +143,13 @@
   font-weight: 700;
 }
 
+.vehicle-availability-note {
+  margin: 14px 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .vehicle-quick-specs {
   margin: 25px 0;
   padding: 15px 0;

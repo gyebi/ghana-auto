@@ -7,7 +7,7 @@
     "build": "prisma generate --config prisma7.config.ts && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/*.mjs",
+    "test": "node --experimental-test-module-mocks --test tests/*.mjs",
     "test:integration": "node --test tests/integration/*.integration.mjs"
   },
   "dependencies": {

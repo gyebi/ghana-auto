@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import StaffLogin from "@/components/admin/StaffLogin";
 import StaffSignOut from "@/components/admin/StaffSignOut";
+import AdminNavigation from "@/components/admin/AdminNavigation";
 import { getCurrentStaffSession } from "@/lib/auth/staff-session";
 import "./admin.css";
 
@@ -15,14 +16,6 @@ export const metadata = {
   },
 };
 
-const navigation = [
-  { label: "Dashboard", icon: "▦" },
-  { label: "Vehicles", icon: "▤" },
-  { label: "Enquiries", icon: "✉" },
-  { label: "Staff", icon: "♙" },
-  { label: "Settings", icon: "⚙" },
-];
-
 const statistics = [
   { label: "Total Vehicles", value: "32" },
   { label: "Available Vehicles", value: "24" },
@@ -33,36 +26,7 @@ const statistics = [
 function AdminDashboard({ staffUser }) {
   return (
     <div className="admin-dashboard">
-      <aside className="admin-sidebar">
-        <Link href="/" className="admin-brand">
-          GHANA <span>AUTO</span>
-        </Link>
-
-        <p className="admin-sidebar-caption">
-          DEALERSHIP MANAGEMENT
-        </p>
-
-        <nav aria-label="Admin sections">
-          {navigation.map((item, index) => (
-            <span
-              key={item.label}
-              className={
-                index === 0
-                  ? "admin-nav-item active"
-                  : "admin-nav-item"
-              }
-              aria-current={index === 0 ? "page" : undefined}
-            >
-              <span aria-hidden="true">{item.icon}</span>
-              {item.label}
-            </span>
-          ))}
-        </nav>
-
-        <Link href="/" className="admin-back-link">
-          ← Back to Website
-        </Link>
-      </aside>
+      <AdminNavigation activeSection="Dashboard" />
 
       <div className="admin-main">
         <div className="admin-topbar">

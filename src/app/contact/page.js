@@ -12,7 +12,7 @@ import "./contact.css";
 
 export const metadata = {
   title: "Contact Us | Ghana Auto",
-  description: "Contact Ghana Auto about a vehicle.",
+  description: "Contact Ghana Auto about a car.",
 };
 
 async function ContactContent({ searchParams }) {
@@ -34,7 +34,7 @@ async function ContactContent({ searchParams }) {
 
       {enquiry ? (
         <div className="contact-vehicle">
-          <h2>Your Vehicle Enquiry</h2>
+          <h2>Your Car Enquiry</h2>
 
           <p>
             You&apos;re interested in:
@@ -58,12 +58,12 @@ async function ContactContent({ searchParams }) {
           )}
 
           <Link href={`/cars/${enquiry.slug}`}>
-            ← View Vehicle Again
+            ← View Car Again
           </Link>
         </div>
       ) : (
         <p>
-          Browse our available vehicles or contact
+          Browse our available cars or contact
           our dealership for more information.
         </p>
       )}

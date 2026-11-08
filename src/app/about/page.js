@@ -10,7 +10,7 @@ export default function AboutPage() {
       <h1>About Our Dealership</h1>
       <p>
         Learn more about our dealership,
-        vehicle selection, and services.
+        car selection, and services.
       </p>
     </section>
   );

@@ -3,10 +3,8 @@ import { timingSafeEqual } from "node:crypto";
 export const MAX_SESSION_REQUEST_BYTES = 8 * 1024;
 const CSRF_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32,128}$/;
 
-export function isSameOriginRequest(request) {
-  const origin = request.headers.get("origin");
-
-  if (!origin) return false;
+export function isAllowedStaffOrigin(origin, fallbackOrigin) {
+  if (typeof origin !== "string" || !origin) return false;
 
   try {
     const suppliedOrigin = new URL(origin);
@@ -36,11 +34,17 @@ export function isSameOriginRequest(request) {
       return origin === configuredOrigin;
     }
 
-    // Local development: preserve the existing same-origin check.
-    return origin === new URL(request.url).origin;
+    return origin === fallbackOrigin;
   } catch {
     return false;
   }
+}
+
+export function isSameOriginRequest(request) {
+  return isAllowedStaffOrigin(
+    request.headers.get("origin"),
+    new URL(request.url).origin
+  );
 }
 
 export function hasJsonContentType(request) {

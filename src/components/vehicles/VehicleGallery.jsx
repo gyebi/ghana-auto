@@ -41,7 +41,7 @@ export default function VehicleGallery({ images = [], title }) {
       <div className="gallery-placeholder" role="img"
         aria-label={`No photograph available for ${title}`}>
         <span aria-hidden="true">🚘</span>
-        <p>Vehicle photographs coming soon</p>
+        <p>Car photographs coming soon</p>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export default function VehicleGallery({ images = [], title }) {
               type="button"
               className="gallery-arrow gallery-arrow-prev"
               onClick={showPrevious}
-              aria-label="Previous vehicle photograph"
+              aria-label="Previous car photograph"
             >
               <span aria-hidden="true">‹</span>
             </button>
@@ -73,7 +73,7 @@ export default function VehicleGallery({ images = [], title }) {
               type="button"
               className="gallery-arrow gallery-arrow-next"
               onClick={showNext}
-              aria-label="Next vehicle photograph"
+              aria-label="Next car photograph"
             >
               <span aria-hidden="true">›</span>
             </button>

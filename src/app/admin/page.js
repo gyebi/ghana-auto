@@ -17,9 +17,9 @@ export const metadata = {
 };
 
 const statistics = [
-  { label: "Total Vehicles", value: "32" },
-  { label: "Available Vehicles", value: "24" },
-  { label: "Sold Vehicles", value: "8" },
+  { label: "Total Cars", value: "32" },
+  { label: "Available Cars", value: "24" },
+  { label: "Sold Cars", value: "8" },
   { label: "New Enquiries", value: "12" },
 ];
 
@@ -69,9 +69,9 @@ function AdminDashboard({ staffUser }) {
         <section className="admin-panel">
           <div className="admin-panel-header">
             <div>
-              <h2>Vehicle Management</h2>
+              <h2>Car Management</h2>
               <p>
-                Add, update, and manage vehicle listings
+                Add, update, and manage car listings
                 from one dashboard.
               </p>
             </div>
@@ -81,7 +81,7 @@ function AdminDashboard({ staffUser }) {
             <span aria-hidden="true">🚘</span>
             <h3>Inventory Management Coming Soon</h3>
             <p>
-              Vehicle listings will become manageable
+              Car listings will become manageable
               once authentication and database integration
               are completed.
             </p>

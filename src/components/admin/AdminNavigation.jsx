@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const navigation = [
   { label: "Dashboard", icon: "▦", href: "/admin" },
-  { label: "Vehicles", icon: "▤", href: "/admin/vehicles" },
+  { label: "Cars", icon: "▤", href: "/admin/vehicles" },
   { label: "Enquiries", icon: "✉" },
   { label: "Staff", icon: "♙" },
   { label: "Settings", icon: "⚙" },

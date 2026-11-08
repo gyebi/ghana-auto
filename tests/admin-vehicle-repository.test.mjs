@@ -124,6 +124,7 @@ test("admin inventory search, status filtering, and pagination stay in Prisma", 
     { id: "asc" },
   ]);
   assert.deepEqual(prismaState.findManyArgs.select, {
+    id: true,
     stockCode: true,
     make: true,
     model: true,

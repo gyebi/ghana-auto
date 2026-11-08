@@ -16,7 +16,7 @@ import VehicleShare from "@/components/vehicles/VehicleShare";
 import "./vehicle-detail.css";
 
 export const metadata = {
-  title: "Vehicle Details | Ghana Auto",
+  title: "Car Details | Ghana Auto",
   robots: {
     index: false,
     follow: false,
@@ -97,7 +97,7 @@ async function VehicleDetailContent({ params }) {
           />
 
           <section className="vehicle-specifications">
-            <h2>Vehicle Specifications</h2>
+            <h2>Car Specifications</h2>
 
             <dl className="vehicle-spec-grid">
               {specifications.map(([label, value]) => (
@@ -111,7 +111,7 @@ async function VehicleDetailContent({ params }) {
 
           {vehicle.description && (
             <section className="vehicle-description">
-              <h2>About This Vehicle</h2>
+              <h2>About This Car</h2>
               <p>{vehicle.description}</p>
             </section>
           )}
@@ -131,7 +131,7 @@ async function VehicleDetailContent({ params }) {
 
             {isImportOrder && (
               <p className="vehicle-availability-note">
-                This vehicle is available to order and is not
+                This car is available to order and is not
                 currently in local stock.
                 {leadTime && (
                   <> Estimated lead time: {leadTime}, subject to confirmation.</>
@@ -141,7 +141,7 @@ async function VehicleDetailContent({ params }) {
 
             {isInTransit && (
               <p className="vehicle-availability-note">
-                This vehicle is in transit. Arrival timing is an
+                This car is in transit. Arrival timing is an
                 estimate and subject to confirmation.
               </p>
             )}
@@ -192,7 +192,7 @@ export default function VehicleDetailPage({ params }) {
       <Suspense
         fallback={
           <div className="vehicle-detail-loading" role="status">
-            Loading vehicle details...
+            Loading car details...
           </div>
         }
       >

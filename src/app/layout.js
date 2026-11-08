@@ -4,9 +4,9 @@ import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 export const metadata = {
-  title: "Ghana Auto | Find Your Next Vehicle",
+  title: "Ghana Auto | Find Your Next Car",
   description:
-    "Browse quality vehicles in Ghana and contact our dealership.",
+    "Browse quality cars in Ghana and contact our dealership.",
 };
 
 export default function RootLayout({ children }) {

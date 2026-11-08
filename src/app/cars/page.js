@@ -14,7 +14,7 @@ import "./cars.css";
 
 export const metadata = {
   title: "Browse Cars | Ghana Auto",
-  description: "Explore available vehicle listings at Ghana Auto.",
+  description: "Explore available car listings at Ghana Auto.",
   robots: {
     index: false,
     follow: false,
@@ -40,12 +40,12 @@ async function VehicleResults({ searchParams }) {
 
       <div className="cars-toolbar">
         <h2>
-          {hasFilters ? "Search Results" : "Available Vehicles"}
+          {hasFilters ? "Search Results" : "Available Cars"}
         </h2>
 
         <span>
           {vehicles.length}{" "}
-          {vehicles.length === 1 ? "vehicle" : "vehicles"} found
+          {vehicles.length === 1 ? "car" : "cars"} found
         </span>
       </div>
 
@@ -60,13 +60,13 @@ async function VehicleResults({ searchParams }) {
         </div>
       ) : (
         <div className="cars-empty">
-          <h2>No matching vehicles found</h2>
-          <p>Try another make, model, or vehicle type.</p>
+          <h2>No matching cars found</h2>
+          <p>Try another make, model, or car type.</p>
         </div>
       )}
 
       <p className="cars-demo-notice">
-        Demonstration inventory — vehicle details,
+        Demonstration inventory — car details,
         prices, and availability are fictional.
       </p>
     </>
@@ -83,18 +83,18 @@ export default function CarsPage({ searchParams }) {
             EXPLORE OUR COLLECTION
           </p>
 
-          <h1>Find Your Next Vehicle</h1>
+          <h1>Find Your Next Car</h1>
 
           <p>
-            Search our vehicle collection by make,
-            model, or vehicle type.
+            Search our car collection by make,
+            model, or car type.
           </p>
         </div>
 
         <Suspense
           fallback={
             <div className="cars-loading" role="status">
-              Loading vehicle inventory...
+              Loading car inventory...
             </div>
           }
         >

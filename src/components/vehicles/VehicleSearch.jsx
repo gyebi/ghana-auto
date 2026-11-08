@@ -40,7 +40,7 @@ export default function VehicleSearch({
   return (
     <section
       className="vehicle-search-section"
-      aria-label="Vehicle search filters"
+      aria-label="Car search filters"
     >
       <form
         action="/cars"
@@ -87,7 +87,7 @@ export default function VehicleSearch({
         </div>
 
         <div className="vehicle-search-field">
-          <label htmlFor="vehicle-type">Vehicle Type</label>
+          <label htmlFor="vehicle-type">Car Type</label>
 
           <select
             id="vehicle-type"
@@ -107,7 +107,7 @@ export default function VehicleSearch({
 
         <div className="vehicle-search-actions">
           <button type="submit" className="vehicle-search-button">
-            Search Vehicles
+            Search Cars
             <span aria-hidden="true">→</span>
           </button>
 

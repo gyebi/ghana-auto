@@ -14,6 +14,7 @@ const adminVehicleStatuses = new Set([
 ]);
 
 const adminVehicleSelect = {
+  id: true,
   stockCode: true,
   make: true,
   model: true,

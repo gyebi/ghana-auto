@@ -8,7 +8,7 @@ const vehicleNotFoundDocument = `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Vehicle Not Found | Ghana Auto</title>
+    <title>Car Not Found | Ghana Auto</title>
     <style>
       body { margin: 0; font-family: Arial, sans-serif; }
       .container { min-height: 65vh; display: flex; align-items: center; justify-content: center; padding: 70px 24px; background: #f5f7fa; }
@@ -23,9 +23,9 @@ const vehicleNotFoundDocument = `<!doctype html>
     <section class="container">
       <div class="content">
         <p class="errorCode">404</p>
-        <h1 class="title">Vehicle Not Found</h1>
-        <p class="description">The vehicle you are looking for may have been removed, sold, or is no longer available. Explore our current inventory to find another great option.</p>
-        <a class="button" href="/cars">← Browse Available Vehicles</a>
+        <h1 class="title">Car Not Found</h1>
+        <p class="description">The car you are looking for may have been removed, sold, or is no longer available. Explore our current inventory to find another great option.</p>
+        <a class="button" href="/cars">← Browse Available Cars</a>
       </div>
     </section>
   </body>

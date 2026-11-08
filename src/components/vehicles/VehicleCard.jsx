@@ -37,7 +37,7 @@ export default function VehicleCard({ vehicle }) {
         ) : (
           <div className="vehicle-card-placeholder">
             <span aria-hidden="true">🚘</span>
-            <p>Vehicle image coming soon</p>
+            <p>Car image coming soon</p>
           </div>
         )}
 
@@ -96,7 +96,7 @@ export default function VehicleCard({ vehicle }) {
           className="vehicle-card-button"
           href={`/cars/${encodeURIComponent(vehicle.slug)}`}
         >
-          View Vehicle Details
+          View Car Details
           <span aria-hidden="true">→</span>
         </Link>
       </div>

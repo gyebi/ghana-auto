@@ -13,7 +13,7 @@ import { formatVehiclePrice } from "@/lib/vehicle-format";
 import "../admin.css"
 
 export const metadata = {
-  title: "Vehicle Inventory | Ghana Auto Admin",
+  title: "Car Inventory | Ghana Auto Admin",
   robots: {
     index: false,
     follow: false,
@@ -53,6 +53,7 @@ function VehicleRows({ vehicles }) {
       <td><span className="admin-vehicle-status">{vehicle.status}</span></td>
       <td>{vehicle.inventoryType.replaceAll("_", " ")}</td>
       <td>{vehicle.published ? "Published" : "Unpublished"}</td>
+      <td><Link href={`/admin/vehicles/${vehicle.id}/edit`}>Edit</Link></td>
     </tr>
   ));
 }
@@ -72,6 +73,7 @@ function VehicleCards({ vehicles }) {
             <div><dt>Inventory</dt><dd>{vehicle.inventoryType.replaceAll("_", " ")}</dd></div>
             <div><dt>Visibility</dt><dd>{vehicle.published ? "Published" : "Unpublished"}</dd></div>
           </dl>
+          <Link href={`/admin/vehicles/${vehicle.id}/edit`}>Edit car</Link>
         </article>
       ))}
     </div>
@@ -92,13 +94,13 @@ function VehicleInventory({ staffUser, listing }) {
 
   return (
     <div className="admin-dashboard">
-      <AdminNavigation activeSection="Vehicles" />
+      <AdminNavigation activeSection="Cars" />
 
       <div className="admin-main">
         <div className="admin-topbar">
           <div>
             <p className="admin-eyebrow">ADMINISTRATION</p>
-            <h1>Vehicle Inventory</h1>
+            <h1>Car Inventory</h1>
           </div>
         </div>
 
@@ -112,9 +114,13 @@ function VehicleInventory({ staffUser, listing }) {
         <section className="admin-panel" aria-labelledby="inventory-heading">
           <div className="admin-panel-header">
             <div>
-              <h2 id="inventory-heading">All vehicle listings</h2>
+              <h2 id="inventory-heading">All car listings</h2>
               <p>Search and review every inventory record.</p>
             </div>
+            <Link href="/admin/vehicles/new"
+                  className="admin-vehicle-create-link">
+              + Create New Car Listing
+            </Link>
           </div>
 
           <form className="admin-vehicle-filters" action="/admin/vehicles" method="get">
@@ -141,17 +147,17 @@ function VehicleInventory({ staffUser, listing }) {
           </form>
 
           <p className="admin-vehicle-count" aria-live="polite">
-            {listing.total} {listing.total === 1 ? "vehicle" : "vehicles"} found
+            {listing.total} {listing.total === 1 ? "car" : "cars"} found
           </p>
 
           {listing.vehicles.length === 0 ? (
             <div className="admin-empty-state">
               <span aria-hidden="true">🚘</span>
-              <h3>No vehicles found</h3>
+              <h3>No cars found</h3>
               <p>
                 {listing.search || listing.status
                   ? "Try changing the search or status filter."
-                  : "Vehicle inventory will appear here once records are available."}
+                  : "Car inventory will appear here once records are available."}
               </p>
             </div>
           ) : (
@@ -161,11 +167,12 @@ function VehicleInventory({ staffUser, listing }) {
                   <thead>
                     <tr>
                       <th scope="col">Stock code</th>
-                      <th scope="col">Vehicle</th>
+                      <th scope="col">Car</th>
                       <th scope="col">Price</th>
                       <th scope="col">Status</th>
                       <th scope="col">Inventory type</th>
                       <th scope="col">Visibility</th>
+                      <th scope="col"><span className="sr-only">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody><VehicleRows vehicles={listing.vehicles} /></tbody>
@@ -176,7 +183,7 @@ function VehicleInventory({ staffUser, listing }) {
           )}
 
           {listing.totalPages > 1 && (
-            <nav className="admin-pagination" aria-label="Vehicle inventory pages">
+            <nav className="admin-pagination" aria-label="Car inventory pages">
               {hasPreviousPage ? (
                 <Link href={previousHref}>← Previous</Link>
               ) : <span>← Previous</span>}
@@ -197,7 +204,7 @@ function AdminVehiclesLoading() {
     <section className="admin-login" aria-live="polite">
       <div className="admin-login-card">
         <p className="admin-eyebrow">ADMINISTRATION</p>
-        <h1>Loading vehicle inventory…</h1>
+        <h1>Loading car inventory…</h1>
       </div>
     </section>
   );

@@ -73,6 +73,7 @@ const {
   allocateNextStockCode,
   createDraftVehicle,
   findAdminVehicleForCreationConfirmation,
+  findAdminVehicleForEdit,
   updateDraftVehicle,
 } = await import("../src/lib/db/admin-vehicle-mutation-repository.js");
 
@@ -191,6 +192,42 @@ test("confirmation lookup selects only the saved draft summary fields", async ()
       status: true,
       published: true,
     },
+  });
+});
+
+test("draft edit lookup includes only display-safe attached image fields in position order", async () => {
+  reset();
+  state.confirmationResult = {
+    id: "clxvehicle01",
+    price: null,
+    images: [
+      {
+        id: "image-1",
+        imageUrl: "https://res.cloudinary.com/test/image/upload/photo.webp",
+        altText: null,
+        position: 0,
+        isCover: true,
+      },
+    ],
+  };
+
+  const result = await findAdminVehicleForEdit("clxvehicle01");
+
+  assert.deepEqual(result.images, state.confirmationResult.images);
+  assert.deepEqual(state.confirmationArgs.where, {
+    id: "clxvehicle01",
+    status: "DRAFT",
+    published: false,
+  });
+  assert.deepEqual(state.confirmationArgs.select.images, {
+    select: {
+      id: true,
+      imageUrl: true,
+      altText: true,
+      position: true,
+      isCover: true,
+    },
+    orderBy: { position: "asc" },
   });
 });
 

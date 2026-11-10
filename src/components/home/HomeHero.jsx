@@ -54,14 +54,14 @@ export default function HomeHero() {
           </h1>
 
           <p className="hero-description">
-            Discover your next vehicle from our collection
+            Discover your next car from our collection
             of cars and SUVs. Browse the details, explore
             your options, and contact us directly.
           </p>
 
           <div className="hero-actions">
             <Link href="/cars" className="hero-btn hero-btn-primary">
-              Explore Vehicles
+              Explore Cars
             </Link>
 
             <Link

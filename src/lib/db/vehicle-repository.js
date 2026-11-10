@@ -6,7 +6,7 @@ import {
   publicVehicleWhere,
   toPublicVehicle,
 } from "./public-vehicle-policy.mjs";
-import { getPrismaClient } from "./prisma";
+import { getPrismaClient } from "./prisma.js";
 
 // Only select fields approved for the public website.
 const publicVehicleSelect = {
@@ -33,11 +33,13 @@ const publicVehicleSelect = {
   estimatedLeadTimeMaxDays: true,
   images: {
     orderBy: [
+      { isCover: "desc" },
       { position: "asc" },
       { createdAt: "asc" },
     ],
     select: {
       imageUrl: true,
+      isCover: true,
     },
   },
 };
@@ -79,16 +81,14 @@ export async function getPublicVehicleBySlug(slug) {
   const prisma = getPrismaClient();
 
   const vehicle = await prisma.vehicle.findFirst({
-     where: {
+    where: {
       ...publicVehicleWhere,
       slug,
     },
-    select: {
-      id: true,
-    },
+    select: publicVehicleSelect,
   });
 
-  return vehicle !== null;
+  return toPublicVehicle(vehicle);
 }
 
 

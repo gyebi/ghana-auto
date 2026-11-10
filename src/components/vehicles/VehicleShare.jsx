@@ -16,7 +16,7 @@ export default function VehicleShare({ title }) {
       try {
         await navigator.share({
           title,
-          text: `View this vehicle: ${title}`,
+          text: `View this car: ${title}`,
           url,
         });
 
@@ -36,7 +36,7 @@ export default function VehicleShare({ title }) {
       }
 
       await navigator.clipboard.writeText(url);
-      setMessage("Vehicle link copied!");
+      setMessage("Car link copied!");
     } catch {
       setMessage(
         "Unable to share automatically. Please copy the page URL from your browser."
@@ -52,7 +52,7 @@ export default function VehicleShare({ title }) {
         onClick={handleShare}
       >
         <span aria-hidden="true">↗</span>
-        Share This Vehicle
+        Share This Car
       </button>
 
       {message && (

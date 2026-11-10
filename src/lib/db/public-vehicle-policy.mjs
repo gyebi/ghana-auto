@@ -5,6 +5,9 @@ export const publicVehicleWhere = {
   inventoryType: {
     in: ["LOCAL_STOCK", "IMPORT_ORDER", "IN_TRANSIT"],
   },
+  // A record is not publicly eligible without a selected gallery cover. This
+  // also keeps legacy AVAILABLE/published inconsistencies out of public URLs.
+  images: { some: { isCover: true } },
 };
 
 export function isValidPublicVehicleSlug(slug) {

@@ -21,7 +21,7 @@ export default function Footer() {
             </Link>
 
             <p>
-              Explore our vehicle collection and find
+              Explore our car collection and find
               the right car for your needs.
             </p>
           </div>
@@ -39,10 +39,10 @@ export default function Footer() {
           </div>
 
           <div className="footer-column">
-            <h3>Our Vehicles</h3>
+            <h3>Our Cars</h3>
             <p>
               Browse our selection of available cars,
-              SUVs, and other vehicles.
+              SUVs, and more.
             </p>
 
             <Link href="/cars" className="footer-action">
@@ -54,7 +54,7 @@ export default function Footer() {
             <h3>Contact Us</h3>
 
             <p>
-              Interested in a vehicle? Contact our
+              Interested in a car? Contact our
               dealership for more information.
             </p>
 

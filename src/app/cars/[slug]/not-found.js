@@ -10,21 +10,20 @@ export default function VehicleNotFound() {
         <p className={styles.errorCode}>404</p>
 
         <h1 className={styles.title}>
-          Vehicle Not Found
+          Car Not Found
         </h1>
 
         <p className={styles.description}>
-          The vehicle you are looking for may have been
+          The car you are looking for may have been
           removed, sold, or is no longer available.
           Explore our current inventory to find
           another great option.
         </p>
 
         <Link href="/cars" className={styles.button}>
-          ← Browse Available Vehicles
+          ← Browse Available Cars
         </Link>
       </div>
     </section>
   );
 }
-

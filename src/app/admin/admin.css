@@ -137,6 +137,7 @@
   padding: 12px 14px;
   border-radius: 7px;
   color: #cbd5e1;
+  text-decoration: none;
 }
 
 .admin-nav-item.active {
@@ -297,6 +298,549 @@
   line-height: 1.4;
 }
 
+.admin-vehicle-filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.admin-vehicle-filters label {
+  display: grid;
+  gap: 6px;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.admin-vehicle-filters input,
+.admin-vehicle-filters select {
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: #17212d;
+  font: inherit;
+}
+
+.admin-vehicle-filters input {
+  width: min(100%, 320px);
+}
+
+.admin-vehicle-filters button,
+.admin-pagination a {
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--admin-amber);
+  color: var(--admin-navy);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-vehicle-count {
+  margin: 22px 0 12px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.admin-vehicle-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+}
+
+.admin-vehicle-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  background: white;
+  text-align: left;
+}
+
+.admin-vehicle-table th,
+.admin-vehicle-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 0.9rem;
+}
+
+.admin-vehicle-table th {
+  color: #475569;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-vehicle-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-vehicle-status,
+.admin-vehicle-stock-code {
+  color: #8a5400;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.admin-vehicle-cards {
+  display: none;
+}
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.admin-pagination > span:first-child,
+.admin-pagination > span:last-child {
+  min-height: 42px;
+  padding: 10px 14px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.admin-vehicle-create-link,
+.admin-vehicle-card > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--admin-amber);
+  color: var(--admin-navy);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-vehicle-table a {
+  color: #8a5400;
+  font-weight: 700;
+}
+
+.admin-vehicle-form {
+  display: grid;
+  gap: 28px;
+  margin-top: 24px;
+}
+
+.admin-vehicle-form fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.admin-vehicle-form legend {
+  margin-bottom: 14px;
+  color: var(--admin-navy);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.admin-vehicle-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-vehicle-field {
+  display: grid;
+  gap: 6px;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.admin-vehicle-field b {
+  color: #b42318;
+}
+
+.admin-vehicle-field input,
+.admin-vehicle-field select,
+.admin-vehicle-field textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: #17212d;
+  font: inherit;
+  font-weight: 400;
+}
+
+.admin-vehicle-field textarea {
+  resize: vertical;
+}
+
+.admin-vehicle-field:has(textarea) {
+  margin-top: 16px;
+}
+
+.admin-checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  color: #334155;
+  font-size: 0.88rem;
+}
+
+.admin-field-help,
+.admin-panel-intro {
+  margin: 0 0 16px;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.admin-field-error,
+.admin-form-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.admin-form-error {
+  padding: 12px;
+  border: 1px solid #f4b4ad;
+  border-radius: 6px;
+  background: #fff3f2;
+}
+
+.admin-error-summary h2 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.admin-error-summary p,
+.admin-error-summary ul {
+  margin: 0;
+}
+
+.admin-error-summary ul {
+  padding-left: 20px;
+}
+
+.admin-error-summary a {
+  color: inherit;
+}
+
+.admin-confirmation-panel {
+  max-width: 760px;
+}
+
+.admin-confirmation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #166534;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.admin-confirmation-status span {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dcfce7;
+}
+
+.admin-confirmation-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.admin-confirmation-details div {
+  padding: 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.admin-confirmation-details dt {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-confirmation-details dd {
+  margin: 6px 0 0;
+  color: var(--admin-navy);
+  font-weight: 800;
+}
+
+.admin-confirmation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-confirmation-actions a {
+  min-height: 42px;
+  padding: 11px 14px;
+  border: 1px solid var(--admin-navy);
+  border-radius: 6px;
+  color: var(--admin-navy);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-confirmation-actions a:first-child {
+  border-color: var(--admin-amber);
+  background: var(--admin-amber);
+}
+
+.admin-confirmation-actions a:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.admin-vehicle-form-actions button {
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--admin-amber);
+  color: var(--admin-navy);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-vehicle-form-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.admin-photo-upload {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-photo-upload-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-photo-upload h2 {
+  margin: 0;
+}
+
+.admin-photo-upload-header p,
+.admin-photo-upload-header strong {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.admin-photo-upload-header strong {
+  color: var(--admin-navy);
+}
+
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.admin-photo-thumbnail {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.admin-photo-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-photo-thumbnail-meta {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  background: linear-gradient(transparent, rgba(16, 27, 43, 0.92));
+}
+
+.admin-photo-cover-indicator {
+  width: max-content;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: var(--admin-amber);
+  color: var(--admin-navy);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-photo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.admin-photo-controls button {
+  min-height: 28px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  background: rgba(16, 27, 43, 0.85);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-photo-controls button:last-child {
+  border-color: #fecaca;
+  color: #fee2e2;
+}
+
+.admin-photo-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-photo-controls button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
+
+.admin-photo-picker {
+  display: grid;
+  gap: 7px;
+  max-width: 420px;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.admin-photo-picker input {
+  width: 100%;
+  padding: 9px;
+  border: 1px dashed #94a3b8;
+  border-radius: 6px;
+  background: #f8fafc;
+  font: inherit;
+}
+
+.admin-photo-message {
+  display: grid;
+  gap: 7px;
+  padding: 11px 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.88rem;
+}
+
+.admin-photo-message.error {
+  border-color: #f4b4ad;
+  background: #fff3f2;
+  color: #b42318;
+}
+
+.admin-photo-message p {
+  margin: 0;
+}
+
+.admin-photo-message progress {
+  width: 100%;
+  accent-color: var(--admin-amber);
+}
+
+.admin-success-message {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 700;
+}
+
+.admin-vehicle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.admin-vehicle-status-action {
+  margin: 0;
+}
+
+.admin-vehicle-status-action button {
+  padding: 6px 8px;
+  border: 1px solid var(--admin-border);
+  border-radius: 5px;
+  background: white;
+  color: #334155;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-vehicle-status-action p {
+  max-width: 200px;
+  margin: 5px 0 0;
+  color: #b42318;
+  font-size: 0.76rem;
+}
+
+.admin-vehicle-read-only {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-vehicle-read-only div {
+  padding: 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+}
+
+.admin-vehicle-read-only dt {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-vehicle-read-only dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1100px) {
   .admin-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -341,6 +885,89 @@
 
   .admin-panel {
     padding: 18px;
+  }
+
+  .admin-vehicle-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-vehicle-filters input,
+  .admin-vehicle-filters select,
+  .admin-vehicle-filters button {
+    width: 100%;
+  }
+
+  .admin-vehicle-table-wrap {
+    display: none;
+  }
+
+  .admin-vehicle-cards {
+    display: grid;
+    gap: 12px;
+  }
+
+  .admin-vehicle-card {
+    padding: 16px;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    background: white;
+  }
+
+  .admin-vehicle-card h3 {
+    margin: 5px 0 0;
+    font-size: 1rem;
+  }
+
+  .admin-vehicle-card dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 18px 0 0;
+  }
+
+  .admin-vehicle-card dt {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .admin-vehicle-card dd {
+    margin: 4px 0 0;
+    font-size: 0.86rem;
+  }
+
+  .admin-pagination {
+    flex-wrap: wrap;
+  }
+
+  .admin-vehicle-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-confirmation-details {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-confirmation-actions {
+    flex-direction: column;
+  }
+
+  .admin-confirmation-actions a {
+    text-align: center;
+  }
+
+  .admin-photo-upload-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-vehicle-actions {
+    margin-top: 14px;
+  }
+
+  .admin-vehicle-read-only {
+    grid-template-columns: 1fr;
   }
 }
 

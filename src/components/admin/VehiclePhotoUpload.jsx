@@ -57,6 +57,7 @@ export default function VehiclePhotoUpload({ vehicleId, initialImages = [] }) {
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [managingPhotoId, setManagingPhotoId] = useState(null);
 
   useEffect(
     () => () => {
@@ -79,6 +80,49 @@ export default function VehiclePhotoUpload({ vehicleId, initialImages = [] }) {
     }
 
     return payload;
+  }
+
+  async function managePhoto(action, imageId, direction) {
+    if (
+      action === "remove" &&
+      !window.confirm("Remove this photo from the car? This cannot be undone from the car inventory.")
+    ) {
+      return;
+    }
+
+    setManagingPhotoId(imageId);
+    setError("");
+    setStatus("");
+
+    try {
+      const response = await fetch("/api/admin/vehicle-images/manage", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(
+          action === "reorder" ? { action, imageId, direction } : { action, imageId }
+        ),
+      });
+      const payload = await getJson(response);
+
+      if (Array.isArray(payload?.images)) setImages(payload.images);
+      if (!response.ok || !payload?.ok) {
+        throw new Error(getResponseError(payload, "Unable to update this photo."));
+      }
+
+      setStatus(
+        action === "cover"
+          ? "Cover photo updated."
+          : action === "reorder"
+            ? "Photo order updated."
+            : "Photo removed."
+      );
+      router.refresh();
+    } catch (managementError) {
+      setError(managementError.message || "Unable to update this photo.");
+    } finally {
+      setManagingPhotoId(null);
+    }
   }
 
   async function uploadOne(file, index, total) {
@@ -172,6 +216,41 @@ export default function VehiclePhotoUpload({ vehicleId, initialImages = [] }) {
                 sizes="(max-width: 700px) 45vw, 180px"
                 src={image.imageUrl}
               />
+              <div className="admin-photo-thumbnail-meta">
+                {image.isCover && <span className="admin-photo-cover-indicator">Cover Photo</span>}
+                <div aria-label={`Controls for photo ${index + 1}`} className="admin-photo-controls">
+                  <button
+                    disabled={Boolean(managingPhotoId) || image.isCover}
+                    onClick={() => managePhoto("cover", image.id)}
+                    type="button"
+                  >
+                    Set Cover
+                  </button>
+                  <button
+                    aria-label={`Move photo ${index + 1} left`}
+                    disabled={Boolean(managingPhotoId) || index === 0}
+                    onClick={() => managePhoto("reorder", image.id, "left")}
+                    type="button"
+                  >
+                    ←
+                  </button>
+                  <button
+                    aria-label={`Move photo ${index + 1} right`}
+                    disabled={Boolean(managingPhotoId) || index === images.length - 1}
+                    onClick={() => managePhoto("reorder", image.id, "right")}
+                    type="button"
+                  >
+                    →
+                  </button>
+                  <button
+                    disabled={Boolean(managingPhotoId)}
+                    onClick={() => managePhoto("remove", image.id)}
+                    type="button"
+                  >
+                    Remove Photo
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -7,7 +7,7 @@ const state = {
   authorizationError: null,
   count: 0,
   findCalls: [],
-  vehicle: { id: "clxvehicle01" },
+  vehicle: { id: "clxvehicle01", status: "DRAFT", published: false },
 };
 
 mock.module("server-only", {});
@@ -53,6 +53,18 @@ mock.module("../src/lib/db/admin-vehicle-upload-repository.js", {
     async attachVerifiedVehicleImage() {
       throw new Error("Attachment is not exercised by this issuance test.");
     },
+    async findDraftVehicleImageForManagement() {
+      return null;
+    },
+    async removeDraftVehicleImage() {
+      return null;
+    },
+    async reorderDraftVehicleImage() {
+      return null;
+    },
+    async setDraftVehicleImageCover() {
+      return null;
+    },
   },
 });
 
@@ -65,7 +77,7 @@ function reset() {
   state.authorizationError = null;
   state.count = 0;
   state.findCalls = [];
-  state.vehicle = { id: "clxvehicle01" };
+  state.vehicle = { id: "clxvehicle01", status: "DRAFT", published: false };
 }
 
 test("active staff receive a server-scoped image upload signature without a secret", async () => {

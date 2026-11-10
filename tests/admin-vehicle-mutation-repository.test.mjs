@@ -9,6 +9,11 @@ const state = {
   confirmationResult: null,
   createArgs: [],
   existingCodes: [],
+  transactionCalls: 0,
+  transactionConflicts: 0,
+  transactionFindArgs: [],
+  transactionOptions: [],
+  transactionVehicle: null,
   updateArgs: null,
 };
 
@@ -20,7 +25,13 @@ mock.module("../src/lib/db/prisma.js", {
   namedExports: {
     getPrismaClient() {
       return {
-        $transaction: async (callback) => {
+        $transaction: async (callback, options) => {
+          state.transactionCalls += 1;
+          state.transactionOptions.push(options);
+          if (state.transactionConflicts > 0) {
+            state.transactionConflicts -= 1;
+            throw { code: "P2034" };
+          }
           let releaseAdvisoryLock = null;
           const transaction = {
             async $queryRaw(strings, ...values) {
@@ -45,6 +56,14 @@ mock.module("../src/lib/db/prisma.js", {
                 state.existingCodes.push(args.data.stockCode);
                 return { id: `clxvehicle${state.createArgs.length}`, slug: args.data.slug };
               },
+              async updateMany(args) {
+                state.updateArgs = args;
+                return { count: 1 };
+              },
+              async findFirst(args) {
+                state.transactionFindArgs.push(args);
+                return state.transactionVehicle;
+              },
             },
           };
 
@@ -59,10 +78,6 @@ mock.module("../src/lib/db/prisma.js", {
             state.confirmationArgs = args;
             return Promise.resolve(state.confirmationResult);
           },
-          updateMany(args) {
-            state.updateArgs = args;
-            return Promise.resolve({ count: 1 });
-          },
         },
       };
     },
@@ -74,7 +89,12 @@ const {
   createDraftVehicle,
   findAdminVehicleForCreationConfirmation,
   findAdminVehicleForEdit,
+  publishDraftVehicle,
+  transitionVehicleStatus,
   updateDraftVehicle,
+  updatePublishedVehicle,
+  updateReservedVehicle,
+  VehicleMutationConflictError,
 } = await import("../src/lib/db/admin-vehicle-mutation-repository.js");
 
 function reset(existingCodes = []) {
@@ -85,6 +105,11 @@ function reset(existingCodes = []) {
   state.confirmationResult = null;
   state.createArgs = [];
   state.existingCodes = [...existingCodes];
+  state.transactionCalls = 0;
+  state.transactionConflicts = 0;
+  state.transactionFindArgs = [];
+  state.transactionOptions = [];
+  state.transactionVehicle = null;
   state.updateArgs = null;
   advisoryLockTail = Promise.resolve();
 }
@@ -244,4 +269,76 @@ test("vehicle updates atomically require an unpublished draft", async () => {
     },
     data: { make: "Toyota" },
   });
+  assert.equal(state.transactionOptions.at(-1)?.isolationLevel, "Serializable");
+  assert.match(state.advisoryLockQueries.at(-1)?.sql, /pg_advisory_xact_lock/);
+});
+
+function eligibleVehicle(overrides = {}) {
+  return {
+    ...draftData(),
+    images: [{ isCover: true }],
+    ...overrides,
+  };
+}
+
+test("publication, live edits, and transitions retry complete serializable transactions", async () => {
+  reset();
+  state.transactionVehicle = eligibleVehicle();
+  state.transactionConflicts = 2;
+  assert.deepEqual(await publishDraftVehicle("clxvehicle01"), { ok: true });
+  assert.equal(state.transactionCalls, 3);
+  assert.equal(state.transactionFindArgs.length, 1);
+  assert.equal(state.transactionOptions.every((item) => item?.isolationLevel === "Serializable"), true);
+
+  reset();
+  state.transactionVehicle = eligibleVehicle();
+  state.transactionConflicts = 1;
+  assert.deepEqual(await updatePublishedVehicle("clxvehicle01", { make: "Honda" }), { id: "clxvehicle01" });
+  assert.equal(state.transactionCalls, 2);
+
+  reset();
+  state.transactionConflicts = 1;
+  assert.deepEqual(await updateReservedVehicle("clxvehicle01", { make: "Honda" }), { id: "clxvehicle01" });
+  assert.equal(state.transactionCalls, 2);
+
+  reset();
+  state.transactionConflicts = 1;
+  assert.deepEqual(await transitionVehicleStatus("clxvehicle01", "reserve"), { ok: true });
+  assert.equal(state.transactionCalls, 2);
+});
+
+test("exhausted serializable retries return a domain-safe conflict", async () => {
+  reset();
+  state.transactionConflicts = 3;
+  await assert.rejects(
+    () => transitionVehicleStatus("clxvehicle01", "sold"),
+    VehicleMutationConflictError
+  );
+  assert.equal(state.transactionCalls, 3);
+});
+
+test("unsupported transitions are rejected without opening a transaction", async () => {
+  reset();
+  assert.deepEqual(
+    await transitionVehicleStatus("clxvehicle01", "publish"),
+    { ok: false, reason: "invalid_transition" }
+  );
+  assert.equal(state.transactionCalls, 0);
+});
+
+test("a live edit cannot commit an ineligible public record", async () => {
+  reset();
+  state.transactionVehicle = eligibleVehicle();
+  const result = await updatePublishedVehicle("clxvehicle01", {
+    inventoryType: "IMPORT_ORDER",
+    originCountry: null,
+    estimatedLeadTimeMinDays: null,
+    estimatedLeadTimeMaxDays: null,
+  });
+  assert.deepEqual(result, {
+    ok: false,
+    reason: "ineligible",
+    problems: ["origin country and an accurate lead-time range for this import car"],
+  });
+  assert.equal(state.updateArgs, null);
 });

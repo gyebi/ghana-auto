@@ -34,3 +34,31 @@ Cloudinary. It must not accept a client public ID, delete by an unqualified
 prefix, or operate against a different Cloudinary cloud or environment. No
 cleanup job is implemented in this checkpoint, so it cannot affect existing
 Cloudinary assets.
+
+## Attached-photo removal and cleanup
+
+Photo removal is deliberately a two-system workflow. The server first reads
+the attached image record from Neon, confirms that its car is an unpublished
+draft, and verifies the exact Cloudinary asset through the Admin API. The
+expected public ID, signed context, resource type, and dynamic `asset_folder`
+must all match the trusted record and the current server environment. The
+browser cannot submit a Cloudinary public ID, folder, or deletion target.
+
+Neon removal then runs in a serializable transaction protected by the
+per-car advisory lock. It removes the image, repairs contiguous positions, and
+ensures that every non-empty image set has one cover. Only after that committed
+transaction does the server call Cloudinary's destroy API for the exact
+verified public ID. This ordering avoids a Neon record pointing at an asset
+that was permanently removed from Cloudinary.
+
+If the Cloudinary destroy call fails after Neon commits, the request returns a
+cleanup-failure response; it does not claim a fully successful deletion. The
+image is safely detached from the car, but it may be an orphan in Cloudinary.
+There is no durable deletion-outbox table or job in the current schema, so this
+checkpoint cannot promise automatic retry across instances or restarts without
+a migration. An authorized operational cleanup may retry only after
+server-side discovery in the exact configured `asset_folder`, a grace period,
+and a Neon check that no `VehicleImage` record retains that exact public ID.
+It must re-verify the asset context before deletion. It must never scan or
+delete legacy root-folder assets, another Ghana Auto environment, or another
+Cloudinary project.

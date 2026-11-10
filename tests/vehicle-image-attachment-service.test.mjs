@@ -19,7 +19,7 @@ mock.module("server-only", {});
 mock.module("../src/lib/auth/staff-session.js", {
   namedExports: {
     async requireActiveStaffSession() {
-      return { firebaseUid: state.staffUid };
+      return { firebaseUid: state.staffUid, role: "STAFF" };
     },
   },
 });
@@ -65,7 +65,7 @@ mock.module("../src/lib/cloudinary/config.js", {
 mock.module("../src/lib/db/admin-vehicle-upload-repository.js", {
   namedExports: {
     async findDraftVehicleForImageUpload() {
-      return { id: "clxvehicle01" };
+      return { id: "clxvehicle01", status: "DRAFT", published: false };
     },
     async countVehicleImagesForUpload() {
       return 0;
@@ -73,6 +73,18 @@ mock.module("../src/lib/db/admin-vehicle-upload-repository.js", {
     async attachVerifiedVehicleImage(input) {
       state.attachCalls.push(input);
       return { ok: true, image: { id: "image-1" } };
+    },
+    async findDraftVehicleImageForManagement() {
+      return null;
+    },
+    async removeDraftVehicleImage() {
+      return null;
+    },
+    async reorderDraftVehicleImage() {
+      return null;
+    },
+    async setDraftVehicleImageCover() {
+      return null;
     },
   },
 });
@@ -117,6 +129,7 @@ test("attachment takes car ID, public ID, and image URL only from a verified gra
       cloudinaryPublicId: "ghana-auto/dev/vehicles/clxvehicle01/nonce-1",
       imageUrl:
         "https://res.cloudinary.com/ghana-auto/image/upload/ghana-auto/dev/vehicles/clxvehicle01/nonce-1.webp",
+      allowPublished: false,
     },
   ]);
 });

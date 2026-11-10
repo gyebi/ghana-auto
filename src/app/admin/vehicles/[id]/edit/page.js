@@ -15,7 +15,12 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-function EditVehicleContent({ vehicle }) {
+function EditVehicleContent({ vehicle, mode, notice }) {
+  const heading = mode === "published"
+    ? "Edit live car"
+    : mode === "reserved"
+      ? "Manage reserved car"
+      : "Edit draft car";
   return (
     <div className="admin-dashboard">
       <AdminNavigation activeSection="Cars" />
@@ -23,48 +28,53 @@ function EditVehicleContent({ vehicle }) {
         <div className="admin-topbar">
           <div>
             <p className="admin-eyebrow">ADMINISTRATION</p>
-            <h1>Edit draft car</h1>
+            <h1>{heading}</h1>
           </div>
           <span className="admin-demo-label">Slug: {vehicle.slug}</span>
         </div>
         <section className="admin-panel">
+          {notice && <p className="admin-success-message" role="status">Changes saved successfully.</p>}
           <p className="admin-panel-intro">
-            Publishing, status, and featured controls are managed in a separate administrator workflow.
+            Publishing and stock-status controls are managed separately. Stock code, slug,
+            visibility, and featured status cannot be edited here.
           </p>
-          <VehicleForm vehicle={vehicle} />
+          <VehicleForm vehicle={vehicle} mode={mode} />
         </section>
-        <section className="admin-panel">
-          <VehiclePhotoUpload
-            initialImages={vehicle.images}
-            key={vehicle.images.map((image) => image.id).join(":")}
-            vehicleId={vehicle.id}
-          />
-        </section>
+        {mode !== "reserved" && (
+          <section className="admin-panel">
+            <VehiclePhotoUpload
+              initialImages={vehicle.images}
+              key={vehicle.images.map((image) => image.id).join(":")}
+              vehicleId={vehicle.id}
+            />
+          </section>
+        )}
       </div>
     </div>
   );
 }
 
-async function EditVehiclePageContent({ params }) {
+async function EditVehiclePageContent({ params, searchParams }) {
   const { id } = await params;
-  let vehicle;
+  const query = await searchParams;
+  let result;
 
   try {
-    vehicle = await getAuthorizedVehicleForEdit(id);
+    result = await getAuthorizedVehicleForEdit(id);
   } catch (error) {
     if (error instanceof StaffAuthorizationError) redirect("/admin");
     throw error;
   }
 
-  if (!vehicle) notFound();
+  if (!result) notFound();
 
-  return <EditVehicleContent vehicle={vehicle} />;
+  return <EditVehicleContent vehicle={result.vehicle} mode={result.mode} notice={query?.notice} />;
 }
 
-export default function EditVehiclePage({ params }) {
+export default function EditVehiclePage({ params, searchParams }) {
   return (
     <Suspense fallback={null}>
-      <EditVehiclePageContent params={params} />
+      <EditVehiclePageContent params={params} searchParams={searchParams} />
     </Suspense>
   );
 }

@@ -33,11 +33,13 @@ const publicVehicleSelect = {
   estimatedLeadTimeMaxDays: true,
   images: {
     orderBy: [
+      { isCover: "desc" },
       { position: "asc" },
       { createdAt: "asc" },
     ],
     select: {
       imageUrl: true,
+      isCover: true,
     },
   },
 };

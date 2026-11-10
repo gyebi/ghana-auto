@@ -5,7 +5,7 @@ const state = {
   countArgs: null,
   countResult: 3,
   findArgs: null,
-  findResult: { id: "clxvehicle01" },
+  findResult: { id: "clxvehicle01", status: "DRAFT", published: false },
 };
 
 mock.module("server-only", {});
@@ -36,13 +36,19 @@ const {
   findDraftVehicleForImageUpload,
 } = await import("../src/lib/db/admin-vehicle-upload-repository.js");
 
-test("draft upload repository selects only a qualifying ID and counts only that car's images", async () => {
+test("image upload repository selects an editable car and counts only that car's images", async () => {
   assert.deepEqual(await findDraftVehicleForImageUpload("clxvehicle01"), {
-    id: "clxvehicle01",
+    id: "clxvehicle01", status: "DRAFT", published: false,
   });
   assert.deepEqual(state.findArgs, {
-    where: { id: "clxvehicle01", status: "DRAFT", published: false },
-    select: { id: true },
+    where: {
+      id: "clxvehicle01",
+      OR: [
+        { status: "DRAFT", published: false },
+        { status: "AVAILABLE", published: true },
+      ],
+    },
+    select: { id: true, status: true, published: true },
   });
 
   assert.equal(await countVehicleImagesForUpload("clxvehicle01"), 3);

@@ -5,6 +5,7 @@ const state = {
   advisoryLockQueries: [],
   baseImageCount: 0,
   created: [],
+  images: [],
   editable: true,
   transactionConflicts: 0,
   transactionOptions: [],
@@ -41,22 +42,47 @@ mock.module("../src/lib/db/prisma.js", {
             },
             vehicleImage: {
               async count() {
-                return state.baseImageCount + state.created.length;
+                return state.images.length;
+              },
+              async findMany() {
+                return state.images.map((image) => ({ ...image }));
               },
               async create(args) {
                 if (
-                  state.created.some(
+                  state.images.some(
                     (image) => image.cloudinaryPublicId === args.data.cloudinaryPublicId
                   )
                 ) {
                   throw { code: "P2002" };
                 }
-                state.created.push(args.data);
-                return {
-                  id: `image-${state.created.length}`,
-                  vehicleId: args.data.vehicleId,
-                  cloudinaryPublicId: args.data.cloudinaryPublicId,
+                const created = {
+                  ...args.data,
+                  id: `image-${state.created.length + 1}`,
                 };
+                state.images.push(created);
+                state.created.push(created);
+                return {
+                  id: created.id,
+                  vehicleId: created.vehicleId,
+                  cloudinaryPublicId: created.cloudinaryPublicId,
+                  imageUrl: created.imageUrl,
+                  altText: null,
+                  position: created.position,
+                  isCover: created.isCover,
+                };
+              },
+              async update({ where, data }) {
+                const image = state.images.find((candidate) => candidate.id === where.id);
+                Object.assign(image, data);
+                return image;
+              },
+              async updateMany({ where, data }) {
+                for (const image of state.images) {
+                  if (image.vehicleId === where.vehicleId && image.isCover === where.isCover) {
+                    Object.assign(image, data);
+                  }
+                }
+                return { count: 1 };
               },
             },
           };
@@ -80,6 +106,15 @@ function reset({ baseImageCount = 0, editable = true, transactionConflicts = 0 }
   state.advisoryLockQueries = [];
   state.baseImageCount = baseImageCount;
   state.created = [];
+  state.images = Array.from({ length: baseImageCount }, (_, index) => ({
+    id: `existing-${index}`,
+    vehicleId: "clxvehicle01",
+    cloudinaryPublicId: `existing-public-id-${index}`,
+    imageUrl: `https://example.test/existing-${index}.webp`,
+    altText: null,
+    position: index,
+    isCover: index === 0,
+  }));
   state.editable = editable;
   state.transactionConflicts = transactionConflicts;
   state.transactionOptions = [];

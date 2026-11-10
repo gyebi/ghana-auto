@@ -96,13 +96,14 @@ test("public detail retrieval uses the approved selection and maps its result", 
     inventoryType: {
       in: ["LOCAL_STOCK", "IMPORT_ORDER", "IN_TRANSIT"],
     },
+    images: { some: { isCover: true } },
     slug: "2019-toyota-rav4",
   });
   assert.equal(prismaCalls[0].select.stockCode, true);
   assert.equal(prismaCalls[0].select.id, undefined);
   assert.deepEqual(prismaCalls[0].select.images, {
-    orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-    select: { imageUrl: true },
+    orderBy: [{ isCover: "desc" }, { position: "asc" }, { createdAt: "asc" }],
+    select: { imageUrl: true, isCover: true },
   });
 });
 

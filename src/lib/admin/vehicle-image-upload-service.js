@@ -7,6 +7,10 @@ import { getCloudinaryConfig } from "../cloudinary/config.js";
 import {
   countVehicleImagesForUpload,
   findDraftVehicleForImageUpload,
+  findDraftVehicleImageForManagement,
+  removeDraftVehicleImage,
+  reorderDraftVehicleImage,
+  setDraftVehicleImageCover,
 } from "../db/admin-vehicle-upload-repository.js";
 import { isValidAdminVehicleId } from "./vehicle-input.js";
 import {
@@ -23,10 +27,22 @@ import {
 import { attachVerifiedVehicleImage } from "../db/admin-vehicle-upload-repository.js";
 
 export class DraftImageUploadError extends Error {
-  constructor(code) {
+  constructor(code, details = {}) {
     super(code);
     this.code = code;
+    Object.assign(this, details);
   }
+}
+
+function isPublishedVehicle(vehicle) {
+  return vehicle?.status === "AVAILABLE" && vehicle?.published === true;
+}
+
+function canManageVehicleImages(staffUser, vehicle) {
+  return (
+    (vehicle?.status === "DRAFT" && vehicle?.published === false) ||
+    (staffUser.role === "ADMIN" && isPublishedVehicle(vehicle))
+  );
 }
 
 export async function issueDraftVehicleImageUploadSignature(id) {
@@ -37,7 +53,9 @@ export async function issueDraftVehicleImageUploadSignature(id) {
   }
 
   const vehicle = await findDraftVehicleForImageUpload(id);
-  if (!vehicle) throw new DraftImageUploadError("not_found");
+  if (!vehicle || !canManageVehicleImages(staffUser, vehicle)) {
+    throw new DraftImageUploadError("not_found");
+  }
 
   const imageCount = await countVehicleImagesForUpload(id);
   if (imageCount >= MAX_DRAFT_VEHICLE_IMAGES) {
@@ -102,6 +120,13 @@ export async function attachIssuedDraftVehicleImage(uploadGrant) {
     throw new DraftImageUploadError("invalid_upload_grant");
   }
 
+  // A grant is not authority to attach after a status change. Re-read the
+  // record, then pass the role-derived constraint into the locked attachment.
+  const vehicle = await findDraftVehicleForImageUpload(grant.vehicleId);
+  if (!vehicle || !canManageVehicleImages(staffUser, vehicle)) {
+    throw new DraftImageUploadError("not_editable");
+  }
+
   let asset;
   try {
     asset = await cloudinary.cloudinary.api.resource(grant.publicId, {
@@ -128,5 +153,104 @@ export async function attachIssuedDraftVehicleImage(uploadGrant) {
     vehicleId: grant.vehicleId,
     cloudinaryPublicId: grant.publicId,
     imageUrl: asset.secure_url,
+    allowPublished: staffUser.role === "ADMIN",
   });
+}
+
+function getCloudinaryImageIdentity({ cloudinaryPublicId, vehicleId, folder }) {
+  if (typeof cloudinaryPublicId !== "string") return null;
+
+  const prefix = `${folder}/${vehicleId}/`;
+  if (!cloudinaryPublicId.startsWith(prefix)) return null;
+
+  const uploadNonce = cloudinaryPublicId.slice(prefix.length);
+  if (!/^[A-Za-z0-9-]{8,128}$/.test(uploadNonce)) return null;
+
+  return { publicId: cloudinaryPublicId, uploadNonce };
+}
+
+async function verifyManagedCloudinaryImage(image) {
+  const cloudinary = getCloudinaryConfig();
+  const identity = getCloudinaryImageIdentity({
+    cloudinaryPublicId: image.cloudinaryPublicId,
+    vehicleId: image.vehicleId,
+    folder: cloudinary.folder,
+  });
+  if (!identity) throw new DraftImageUploadError("invalid_managed_asset");
+
+  let asset;
+  try {
+    asset = await cloudinary.cloudinary.api.resource(identity.publicId, {
+      resource_type: "image",
+      type: "upload",
+      context: true,
+    });
+  } catch {
+    throw new DraftImageUploadError("managed_asset_not_found");
+  }
+
+  const verification = verifyCloudinaryVehicleImageAsset(asset, {
+    vehicleId: image.vehicleId,
+    environment: cloudinary.environment,
+    uploadNonce: identity.uploadNonce,
+    expectedPublicId: identity.publicId,
+    expectedAssetFolder: cloudinary.folder,
+  });
+  if (!verification.ok) throw new DraftImageUploadError("invalid_managed_asset");
+
+  return { cloudinary, identity };
+}
+
+function validateImageManagementInput({ action, imageId, direction }) {
+  if (!isValidAdminVehicleId(imageId)) return false;
+  if (action === "cover" || action === "remove") return direction === undefined;
+  return action === "reorder" && (direction === "left" || direction === "right");
+}
+
+// This service owns every photo-management mutation. The browser submits only
+// an attached Neon image ID and an allowlisted operation; Cloudinary IDs and
+// folders always come from trusted database records and server configuration.
+export async function manageDraftVehicleImage(input) {
+  const staffUser = await requireActiveStaffSession();
+  if (!validateImageManagementInput(input)) {
+    throw new DraftImageUploadError("invalid_management_request");
+  }
+
+  const image = await findDraftVehicleImageForManagement(input.imageId);
+  if (!image || !canManageVehicleImages(staffUser, image.vehicle)) {
+    throw new DraftImageUploadError("not_found_or_not_editable");
+  }
+  const allowPublished = staffUser.role === "ADMIN";
+
+  if (input.action === "cover") {
+    return setDraftVehicleImageCover(image.id, allowPublished);
+  }
+  if (input.action === "reorder") {
+    return reorderDraftVehicleImage(image.id, input.direction, allowPublished);
+  }
+
+  // Verify the Cloudinary asset before detaching it from Neon. If deletion
+  // later fails, Neon has already removed the reference, avoiding a broken
+  // public record; the caller receives an explicit cleanup-failure response.
+  const { cloudinary, identity } = await verifyManagedCloudinaryImage(image);
+  const result = await removeDraftVehicleImage(image.id, allowPublished);
+  if (!result.ok) return result;
+
+  try {
+    const deletion = await cloudinary.cloudinary.uploader.destroy(identity.publicId, {
+      resource_type: "image",
+      type: "upload",
+      invalidate: true,
+    });
+    if (!["ok", "not found"].includes(deletion?.result)) {
+      throw new Error("Cloudinary did not confirm deletion.");
+    }
+  } catch {
+    throw new DraftImageUploadError("cloudinary_cleanup_failed", {
+      detached: true,
+      images: result.images,
+    });
+  }
+
+  return result;
 }

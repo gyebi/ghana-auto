@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/staff-session";
 import { getAuthorizedAdminVehicleListing } from "@/lib/admin/vehicle-listing";
 import { formatVehiclePrice } from "@/lib/vehicle-format";
+import VehicleStatusAction from "@/components/admin/VehicleStatusActions";
 
 import "../admin.css"
 
@@ -42,7 +43,38 @@ function getPageHref({ page, search, status }) {
     : "/admin/vehicles";
 }
 
-function VehicleRows({ vehicles }) {
+function VehicleActions({ vehicle, role }) {
+  const editHref = `/admin/vehicles/${vehicle.id}/edit`;
+  const viewHref = `/admin/vehicles/${vehicle.id}`;
+  const admin = role === "ADMIN";
+
+  if (vehicle.status === "DRAFT") {
+    return <div className="admin-vehicle-actions">
+      <Link href={editHref}>Edit</Link>
+      {admin && <VehicleStatusAction action="publish" label="Publish" vehicleId={vehicle.id} />}
+    </div>;
+  }
+  if (vehicle.status === "AVAILABLE") {
+    if (!admin) return <Link href={viewHref}>View</Link>;
+    return <div className="admin-vehicle-actions">
+      <Link href={editHref}>Edit</Link>
+      <VehicleStatusAction action="unpublish" label="Unpublish" vehicleId={vehicle.id} />
+      <VehicleStatusAction action="reserve" label="Reserve" vehicleId={vehicle.id} />
+      <VehicleStatusAction action="sold" label="Mark sold" vehicleId={vehicle.id} />
+    </div>;
+  }
+  if (vehicle.status === "RESERVED") {
+    if (!admin) return <Link href={viewHref}>View</Link>;
+    return <div className="admin-vehicle-actions">
+      <Link href={editHref}>Manage</Link>
+      <VehicleStatusAction action="sold" label="Mark sold" vehicleId={vehicle.id} />
+      <VehicleStatusAction action="archive" label="Archive" vehicleId={vehicle.id} />
+    </div>;
+  }
+  return <Link href={viewHref}>View</Link>;
+}
+
+function VehicleRows({ vehicles, role }) {
   return vehicles.map((vehicle) => (
     <tr key={vehicle.stockCode}>
       <td>{vehicle.stockCode}</td>
@@ -53,12 +85,12 @@ function VehicleRows({ vehicles }) {
       <td><span className="admin-vehicle-status">{vehicle.status}</span></td>
       <td>{vehicle.inventoryType.replaceAll("_", " ")}</td>
       <td>{vehicle.published ? "Published" : "Unpublished"}</td>
-      <td><Link href={`/admin/vehicles/${vehicle.id}/edit`}>Edit</Link></td>
+      <td><VehicleActions vehicle={vehicle} role={role} /></td>
     </tr>
   ));
 }
 
-function VehicleCards({ vehicles }) {
+function VehicleCards({ vehicles, role }) {
   return (
     <div className="admin-vehicle-cards">
       {vehicles.map((vehicle) => (
@@ -73,14 +105,14 @@ function VehicleCards({ vehicles }) {
             <div><dt>Inventory</dt><dd>{vehicle.inventoryType.replaceAll("_", " ")}</dd></div>
             <div><dt>Visibility</dt><dd>{vehicle.published ? "Published" : "Unpublished"}</dd></div>
           </dl>
-          <Link href={`/admin/vehicles/${vehicle.id}/edit`}>Edit car</Link>
+          <VehicleActions vehicle={vehicle} role={role} />
         </article>
       ))}
     </div>
   );
 }
 
-function VehicleInventory({ staffUser, listing }) {
+function VehicleInventory({ staffUser, listing, notice }) {
   const previousHref = getPageHref({
     ...listing,
     page: listing.page - 1,
@@ -122,6 +154,11 @@ function VehicleInventory({ staffUser, listing }) {
               + Create New Car Listing
             </Link>
           </div>
+          {notice && (
+            <p className="admin-success-message" role="status">
+              {notice === "published" ? "Car published successfully." : "Stock status updated successfully."}
+            </p>
+          )}
 
           <form className="admin-vehicle-filters" action="/admin/vehicles" method="get">
             <label>
@@ -175,10 +212,10 @@ function VehicleInventory({ staffUser, listing }) {
                       <th scope="col"><span className="sr-only">Actions</span></th>
                     </tr>
                   </thead>
-                  <tbody><VehicleRows vehicles={listing.vehicles} /></tbody>
+                  <tbody><VehicleRows vehicles={listing.vehicles} role={staffUser.role} /></tbody>
                 </table>
               </div>
-              <VehicleCards vehicles={listing.vehicles} />
+              <VehicleCards vehicles={listing.vehicles} role={staffUser.role} />
             </>
           )}
 
@@ -228,6 +265,7 @@ async function AdminVehiclesContent({ searchParams }) {
     <VehicleInventory
       staffUser={result.staffUser}
       listing={result.listing}
+      notice={typeof params.notice === "string" ? params.notice : ""}
     />
   );
 }

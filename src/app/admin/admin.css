@@ -632,6 +632,215 @@
   opacity: 0.7;
 }
 
+.admin-photo-upload {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-photo-upload-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-photo-upload h2 {
+  margin: 0;
+}
+
+.admin-photo-upload-header p,
+.admin-photo-upload-header strong {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.admin-photo-upload-header strong {
+  color: var(--admin-navy);
+}
+
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.admin-photo-thumbnail {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.admin-photo-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-photo-thumbnail-meta {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  background: linear-gradient(transparent, rgba(16, 27, 43, 0.92));
+}
+
+.admin-photo-cover-indicator {
+  width: max-content;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: var(--admin-amber);
+  color: var(--admin-navy);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-photo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.admin-photo-controls button {
+  min-height: 28px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  background: rgba(16, 27, 43, 0.85);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-photo-controls button:last-child {
+  border-color: #fecaca;
+  color: #fee2e2;
+}
+
+.admin-photo-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-photo-controls button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
+
+.admin-photo-picker {
+  display: grid;
+  gap: 7px;
+  max-width: 420px;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.admin-photo-picker input {
+  width: 100%;
+  padding: 9px;
+  border: 1px dashed #94a3b8;
+  border-radius: 6px;
+  background: #f8fafc;
+  font: inherit;
+}
+
+.admin-photo-message {
+  display: grid;
+  gap: 7px;
+  padding: 11px 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.88rem;
+}
+
+.admin-photo-message.error {
+  border-color: #f4b4ad;
+  background: #fff3f2;
+  color: #b42318;
+}
+
+.admin-photo-message p {
+  margin: 0;
+}
+
+.admin-photo-message progress {
+  width: 100%;
+  accent-color: var(--admin-amber);
+}
+
+.admin-success-message {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 700;
+}
+
+.admin-vehicle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.admin-vehicle-status-action {
+  margin: 0;
+}
+
+.admin-vehicle-status-action button {
+  padding: 6px 8px;
+  border: 1px solid var(--admin-border);
+  border-radius: 5px;
+  background: white;
+  color: #334155;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-vehicle-status-action p {
+  max-width: 200px;
+  margin: 5px 0 0;
+  color: #b42318;
+  font-size: 0.76rem;
+}
+
+.admin-vehicle-read-only {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-vehicle-read-only div {
+  padding: 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+}
+
+.admin-vehicle-read-only dt {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-vehicle-read-only dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1100px) {
   .admin-stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -746,6 +955,19 @@
 
   .admin-confirmation-actions a {
     text-align: center;
+  }
+
+  .admin-photo-upload-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-vehicle-actions {
+    margin-top: 14px;
+  }
+
+  .admin-vehicle-read-only {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -1,6 +1,8 @@
 import test, { mock } from "node:test";
 import assert from "node:assert/strict";
 
+class MockVehicleMutationConflictError extends Error {}
+
 const state = {
   authorizationError: null,
   createError: null,
@@ -13,6 +15,11 @@ const state = {
   staffUser: null,
   updateCalls: [],
   updateResult: undefined,
+  publishedUpdateCalls: [],
+  publishedUpdateError: null,
+  publishResult: { ok: true },
+  transitionCalls: [],
+  transitionResult: { ok: true },
 };
 
 mock.module("server-only", {});
@@ -48,6 +55,15 @@ mock.module("../src/lib/db/admin-vehicle-mutation-repository.js", {
     async findAdminVehicleForEdit() {
       return null;
     },
+    async findAdminVehicleForPublishedEdit() {
+      return null;
+    },
+    async findAdminVehicleForReadOnlyView() {
+      return null;
+    },
+    async findAdminVehicleForReservedManagement() {
+      return null;
+    },
     async findAdminVehicleForCreationConfirmation(id) {
       state.confirmationCalls.push(id);
       return state.confirmationResult;
@@ -57,13 +73,36 @@ mock.module("../src/lib/db/admin-vehicle-mutation-repository.js", {
       if (state.updateResult !== undefined) return state.updateResult;
       return { id, slug: "stable-slug" };
     },
+    async updatePublishedVehicle(id, data) {
+      state.publishedUpdateCalls.push({ id, data });
+      if (state.publishedUpdateError) throw state.publishedUpdateError;
+      return { id };
+    },
+    async updateReservedVehicle(id, data) {
+      state.publishedUpdateCalls.push({ id, data, reserved: true });
+      return { id };
+    },
+    async publishDraftVehicle(id) {
+      state.publishCall = id;
+      if (state.publishError) throw state.publishError;
+      return state.publishResult;
+    },
+    async transitionVehicleStatus(id, action) {
+      state.transitionCalls.push({ id, action });
+      if (state.transitionError) throw state.transitionError;
+      return state.transitionResult;
+    },
+    VehicleMutationConflictError: MockVehicleMutationConflictError,
   },
 });
 
 const {
   createAdminVehicle,
   getAuthorizedVehicleCreationConfirmation,
+  publishAdminVehicle,
+  transitionAdminVehicle,
   updateAdminVehicle,
+  updatePublishedAdminVehicle,
 } = await import("../src/lib/admin/vehicle-mutation-service.js");
 
 function formData(overrides = {}) {
@@ -107,6 +146,14 @@ function reset({ authorizationError = null, originError = null, role = "STAFF" }
   };
   state.updateCalls = [];
   state.updateResult = undefined;
+  state.publishedUpdateCalls = [];
+  state.publishedUpdateError = null;
+  state.publishCall = null;
+  state.publishResult = { ok: true };
+  state.publishError = null;
+  state.transitionCalls = [];
+  state.transitionResult = { ok: true };
+  state.transitionError = null;
 }
 
 test("active ADMIN and STAFF users can create car drafts without supplying stock codes", async () => {
@@ -354,4 +401,66 @@ test("unexpected database failures are never returned as successful saves", asyn
   state.createError = databaseError;
 
   await assert.rejects(() => createAdminVehicle(formData()), databaseError);
+});
+
+test("only ADMIN may publish, change stock status, or update a published car", async () => {
+  reset({ role: "STAFF" });
+  await assert.rejects(() => publishAdminVehicle("clxvehicle01"), /Administrator authorization/);
+  await assert.rejects(
+    () => updatePublishedAdminVehicle("clxvehicle01", formData()),
+    /Administrator authorization/
+  );
+  await assert.rejects(
+    () => transitionAdminVehicle("clxvehicle01", "sold"),
+    /Administrator authorization/
+  );
+
+  reset({ role: "ADMIN" });
+  const update = await updatePublishedAdminVehicle("clxvehicle01", formData({
+    stockCode: "ATTACKER", slug: "attacker", status: "DRAFT", published: "false",
+  }));
+  assert.equal(update.ok, true);
+  assert.equal(state.publishedUpdateCalls.length, 1);
+  assert.equal("stockCode" in state.publishedUpdateCalls[0].data, false);
+  assert.equal("slug" in state.publishedUpdateCalls[0].data, false);
+  assert.equal("status" in state.publishedUpdateCalls[0].data, false);
+  assert.equal("published" in state.publishedUpdateCalls[0].data, false);
+
+  assert.deepEqual(await publishAdminVehicle("clxvehicle01"), { ok: true });
+  assert.equal(state.publishCall, "clxvehicle01");
+  assert.deepEqual(await transitionAdminVehicle("clxvehicle01", "reserve"), { ok: true });
+  assert.deepEqual(state.transitionCalls, [{ id: "clxvehicle01", action: "reserve" }]);
+});
+
+test("publication and transition failures return safe, actionable errors", async () => {
+  reset({ role: "ADMIN" });
+  state.publishResult = { ok: false, reason: "ineligible", problems: ["at least one photograph"] };
+  const publication = await publishAdminVehicle("clxvehicle01");
+  assert.equal(publication.ok, false);
+  assert.match(publication.message, /at least one photograph/);
+
+  state.transitionResult = { ok: false, reason: "invalid_transition" };
+  const transition = await transitionAdminVehicle("clxvehicle01", "archive");
+  assert.equal(transition.ok, false);
+  assert.match(transition.message, /no longer available/);
+  assert.equal((await transitionAdminVehicle("clxvehicle01", "publish")).ok, false);
+  assert.deepEqual(state.transitionCalls, [{ id: "clxvehicle01", action: "archive" }]);
+});
+
+test("exhausted transaction conflicts are returned without database details", async () => {
+  reset({ role: "ADMIN" });
+  state.publishedUpdateError = new MockVehicleMutationConflictError("internal conflict");
+  const edit = await updatePublishedAdminVehicle("clxvehicle01", formData());
+  assert.equal(edit.ok, false);
+  assert.match(edit.errors.form, /changed by another request/);
+
+  state.publishError = new MockVehicleMutationConflictError("internal conflict");
+  const publish = await publishAdminVehicle("clxvehicle01");
+  assert.equal(publish.ok, false);
+  assert.match(publish.message, /changed by another request/);
+
+  state.transitionError = new MockVehicleMutationConflictError("internal conflict");
+  const transition = await transitionAdminVehicle("clxvehicle01", "sold");
+  assert.equal(transition.ok, false);
+  assert.match(transition.message, /changed by another request/);
 });

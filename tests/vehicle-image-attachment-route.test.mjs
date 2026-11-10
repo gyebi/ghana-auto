@@ -1,6 +1,8 @@
 import test, { mock } from "node:test";
 import assert from "node:assert/strict";
 
+mock.module("next/cache.js", { namedExports: { revalidatePath() {} } });
+
 class MockStaffAuthorizationError extends Error {}
 class MockDraftImageUploadError extends Error {}
 

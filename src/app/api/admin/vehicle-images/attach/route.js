@@ -1,4 +1,5 @@
 import { StaffAuthorizationError } from "../../../../../lib/auth/staff-session.js";
+import { revalidatePath } from "next/cache.js";
 import {
   hasJsonContentType,
   isSameOriginRequest,
@@ -17,6 +18,13 @@ const PRIVATE_NO_STORE_HEADERS = {
 
 function json(body, status) {
   return Response.json(body, { status, headers: PRIVATE_NO_STORE_HEADERS });
+}
+
+function revalidateVehiclePhotos() {
+  revalidatePath("/");
+  revalidatePath("/cars");
+  revalidatePath("/contact");
+  revalidatePath("/cars/[slug]", "page");
 }
 
 function getUploadGrant(body) {
@@ -52,7 +60,10 @@ export async function POST(request) {
   try {
     const result = await attachIssuedDraftVehicleImage(uploadGrant);
 
-    if (result.ok) return json({ ok: true, image: result.image }, 200);
+    if (result.ok) {
+      revalidateVehiclePhotos();
+      return json({ ok: true, image: result.image }, 200);
+    }
     if (result.reason === "already_attached") {
       return json({ ok: true, alreadyAttached: true }, 200);
     }

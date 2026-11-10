@@ -5,6 +5,8 @@ import { useActionState, useEffect } from "react";
 import {
   createVehicleAction,
   updateVehicleAction,
+  updatePublishedVehicleAction,
+  updateReservedVehicleAction,
 } from "@/app/admin/vehicles/actions";
 import {
   focusFirstInvalidVehicleFormField,
@@ -68,10 +70,14 @@ function fieldAccessibility(errors, name) {
   };
 }
 
-export default function VehicleForm({ vehicle }) {
-  const action = vehicle
-    ? updateVehicleAction.bind(null, vehicle.id)
-    : createVehicleAction;
+export default function VehicleForm({ vehicle, mode = "draft" }) {
+  const action = !vehicle
+    ? createVehicleAction
+    : mode === "published"
+      ? updatePublishedVehicleAction.bind(null, vehicle.id)
+      : mode === "reserved"
+        ? updateReservedVehicleAction.bind(null, vehicle.id)
+        : updateVehicleAction.bind(null, vehicle.id);
   const [state, formAction, pending] = useActionState(action, initialState);
   const values = state.values ?? getInitialValues(vehicle);
   const errors = state.errors;
@@ -172,7 +178,7 @@ export default function VehicleForm({ vehicle }) {
           </Field>
           <label className="admin-checkbox-field">
             <input defaultChecked={values.showPrice} name="showPrice" type="checkbox" />
-            Show price publicly when this draft is later published
+            Show price publicly when this car is published
           </label>
         </div>
       </fieldset>
@@ -216,7 +222,15 @@ export default function VehicleForm({ vehicle }) {
 
       <div className="admin-vehicle-form-actions">
         <button aria-disabled={pending} disabled={pending} type="submit">
-          {pending ? "Saving…" : vehicle ? "Save draft changes" : "Create draft car"}
+          {pending
+            ? "Saving…"
+            : !vehicle
+              ? "Create draft car"
+              : mode === "published"
+                ? "Save live car changes"
+                : mode === "reserved"
+                  ? "Save reserved car changes"
+                  : "Save draft changes"}
         </button>
       </div>
     </form>

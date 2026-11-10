@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const configuredStaffOrigin = process.env.STAFF_AUTH_ALLOWED_ORIGIN;
+const configuredCloudName = process.env.CLOUDINARY_CLOUD_NAME;
 let staffActionAllowedOrigins = [];
 
 try {
@@ -22,6 +23,17 @@ const nextConfig = {
       allowedOrigins: staffActionAllowedOrigins,
     },
   },
+  images: configuredCloudName
+    ? {
+      remotePatterns: [
+        {
+          protocol: "https",
+          hostname: "res.cloudinary.com",
+          pathname: `/${configuredCloudName}/**`,
+        },
+      ],
+    }
+    : undefined,
   async headers() {
     return [
       {

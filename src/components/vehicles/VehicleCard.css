@@ -25,7 +25,7 @@
 }
 
 .vehicle-card-image {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .vehicle-card-placeholder {

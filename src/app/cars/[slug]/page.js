@@ -2,6 +2,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 import VehicleGallery from "@/components/vehicles/VehicleGallery";
 import { getPublicVehicleBySlug } from "@/lib/db/vehicle-repository";
@@ -10,6 +12,11 @@ import {
   formatMileage,
   getVehicleTitle,
 } from "@/lib/vehicle-format";
+import {
+  getConfiguredWhatsAppNumber,
+  getVehicleWhatsAppMessage,
+  getWhatsAppUrl,
+} from "@/lib/whatsapp";
 
 import VehicleShare from "@/components/vehicles/VehicleShare";
 
@@ -46,6 +53,13 @@ async function VehicleDetailContent({ params }) {
         : vehicle.estimatedLeadTimeMaxDays != null
           ? `up to ${vehicle.estimatedLeadTimeMaxDays} days`
           : null;
+  const vehicleWhatsAppMessage = getVehicleWhatsAppMessage(vehicle);
+  const vehicleWhatsAppHref = vehicleWhatsAppMessage
+    ? getWhatsAppUrl(
+        getConfiguredWhatsAppNumber(),
+        vehicleWhatsAppMessage
+      )
+    : null;
 
   const specifications = [
     ["Make", vehicle.make],
@@ -166,12 +180,29 @@ async function VehicleDetailContent({ params }) {
               </p>
             </div>
 
-            <Link
-              href={`/contact?vehicle=${encodeURIComponent(vehicle.id)}`}
-              className="vehicle-enquire-btn"
-            >
-              Enquire About This Car
-            </Link>
+            {vehicleWhatsAppHref ? (
+              <a
+                href={vehicleWhatsAppHref}
+                className="vehicle-enquire-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Enquire about ${title} on WhatsApp`}
+              >
+                <FontAwesomeIcon
+                  className="vehicle-enquire-icon"
+                  icon={faWhatsapp}
+                  aria-hidden="true"
+                />
+                Enquire About This Car
+              </a>
+            ) : (
+              <Link
+                href={`/contact?vehicle=${encodeURIComponent(vehicle.id)}`}
+                className="vehicle-enquire-btn"
+              >
+                Enquire About This Car
+              </Link>
+            )}
             <VehicleShare title={title} />
 
 

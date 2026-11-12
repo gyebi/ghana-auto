@@ -21,16 +21,22 @@
 }
 
 .site-logo {
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
   white-space: nowrap;
 }
 
-.site-logo span {
-  color: #f59e0b;
+.site-logo-image {
+  display: block;
+  width: 144px;
+  height: auto;
+}
+
+.site-logo:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 5px;
+  border-radius: 4px;
 }
 
 .header-nav {
@@ -74,6 +80,10 @@
 }
 
 @media (max-width: 768px) {
+  .site-logo-image {
+    width: 124px;
+  }
+
   .mobile-menu-toggle {
     display: block;
   }

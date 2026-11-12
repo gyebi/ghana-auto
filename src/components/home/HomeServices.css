@@ -1,0 +1,146 @@
+.home-services {
+  padding: 88px 24px 96px;
+  background: #ffffff;
+}
+
+.home-services-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.home-services-heading {
+  max-width: 680px;
+  margin-bottom: 36px;
+}
+
+.home-services-eyebrow {
+  margin: 0 0 12px;
+  color: #b8790a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.home-services-heading h2 {
+  margin: 0 0 12px;
+  color: #101b2b;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+}
+
+.home-services-heading > p:last-child {
+  margin: 0;
+  color: #64748b;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.home-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-service-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(16, 27, 43, 0.05);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.home-service-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  place-items: center;
+  background: #fff7e6;
+  color: #f59e0b;
+  font-size: 1.5rem;
+}
+
+.home-service-card h3 {
+  margin: 0 0 10px;
+  color: #101b2b;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.home-service-card p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.home-service-link {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: #101b2b;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.home-service-link span {
+  color: #f59e0b;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-service-card:hover {
+    border-color: #fcd58b;
+    box-shadow: 0 16px 32px rgba(16, 27, 43, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .home-service-link:hover {
+    color: #b8790a;
+  }
+
+  .home-service-link:hover span {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 1000px) {
+  .home-services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-services {
+    padding: 60px 18px 68px;
+  }
+
+  .home-services-heading {
+    margin-bottom: 28px;
+  }
+
+  .home-services-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .home-service-card {
+    min-height: 0;
+    padding: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-service-card,
+  .home-service-link span {
+    transition: none;
+  }
+}

@@ -2,8 +2,10 @@
 
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import WhatsAppFloat from "./WhatsAppFloat";
 import "./Header.css";
 
 const navigation = [
@@ -13,55 +15,61 @@ const navigation = [
   { label: "Contact", href: "/contact" },
 ];
 
-export default function Header() {
+export default function Header({ whatsAppHref }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="site-header">
-      <div className="header-container">
-        <Link
-          href="/"
-          className="site-logo"
-          onClick={() => setMenuOpen(false)}
-        >
-          GHANA <span>AUTO</span>
-        </Link>
-
-        <button
-          className="mobile-menu-toggle"
-          type="button"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          aria-controls="primary-navigation"
-          onClick={() => setMenuOpen((previous) => !previous)}
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
-
-        <nav
-          id="primary-navigation"
-          aria-label="Main navigation"
-          className={`header-nav ${menuOpen ? "is-open" : ""}`}
-        >
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-
+    <>
+      <header className="site-header">
+        <div className="header-container">
           <Link
-            href="/contact"
-            className="header-cta"
+            href="/"
+            className="site-logo"
+            aria-label="Ghana Auto home"
             onClick={() => setMenuOpen(false)}
           >
-            Enquire Now
+            <Image
+              className="site-logo-image"
+              src="/images/branding/ghana-auto-logo-with-flag-stripe.png"
+              alt="Ghana Auto"
+              width={1774}
+              height={887}
+              priority
+            />
           </Link>
-        </nav>
-      </div>
-    </header>
+
+          <button
+            className="mobile-menu-toggle"
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            onClick={() => setMenuOpen((previous) => !previous)}
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+
+          <nav
+            id="primary-navigation"
+            aria-label="Main navigation"
+            className={`header-nav ${menuOpen ? "is-open" : ""}`}
+          >
+            {navigation.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <Suspense fallback={null}>
+        <WhatsAppFloat href={whatsAppHref} />
+      </Suspense>
+    </>
   );
 }

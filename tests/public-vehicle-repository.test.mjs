@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 const prismaCalls = [];
 let nextVehicle = null;
+let nextVehicles = [];
 
 mock.module("server-only", {});
 
@@ -15,6 +16,10 @@ mock.module("../src/lib/db/prisma.js", {
             prismaCalls.push(args);
             return nextVehicle;
           },
+          async findMany(args) {
+            prismaCalls.push(args);
+            return nextVehicles;
+          },
         },
       };
     },
@@ -22,6 +27,7 @@ mock.module("../src/lib/db/prisma.js", {
 });
 
 const {
+  getPublicHomepageVehicles,
   getPublicVehicleBySlug,
   publicVehicleExistsBySlug,
 } = await import("../src/lib/db/vehicle-repository.js");
@@ -54,10 +60,48 @@ const publicVehicleRecord = {
   ],
 };
 
-function resetPrisma(vehicle = null) {
+function resetPrisma(vehicle = null, vehicles = []) {
   prismaCalls.length = 0;
   nextVehicle = vehicle;
+  nextVehicles = vehicles;
 }
+
+test("homepage retrieval fetches only three eligible cars, featured first", async () => {
+  resetPrisma(null, [
+    publicVehicleRecord,
+    {
+      ...publicVehicleRecord,
+      stockCode: "GA-002",
+      slug: "2020-hyundai-tucson",
+      featured: false,
+    },
+  ]);
+
+  const vehicles = await getPublicHomepageVehicles();
+
+  assert.deepEqual(
+    vehicles.map((vehicle) => vehicle.id),
+    ["GA-001", "GA-002"]
+  );
+  assert.equal(prismaCalls.length, 1);
+  assert.deepEqual(prismaCalls[0].where, {
+    published: true,
+    status: "AVAILABLE",
+    inventoryType: {
+      in: ["LOCAL_STOCK", "IMPORT_ORDER", "IN_TRANSIT"],
+    },
+    images: { some: { isCover: true } },
+  });
+  assert.equal(prismaCalls[0].take, 3);
+  assert.deepEqual(prismaCalls[0].orderBy, [
+    { featured: "desc" },
+    { createdAt: "desc" },
+  ]);
+  assert.deepEqual(prismaCalls[0].select.images, {
+    orderBy: [{ isCover: "desc" }, { position: "asc" }, { createdAt: "asc" }],
+    select: { imageUrl: true, isCover: true },
+  });
+});
 
 test("public detail retrieval uses the approved selection and maps its result", async () => {
   resetPrisma(publicVehicleRecord);

@@ -164,7 +164,10 @@
 }
 
 .vehicle-enquire-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 15px;
   border-radius: 6px;
   background: #f59e0b;
@@ -172,6 +175,11 @@
   font-weight: 800;
   text-decoration: none;
   text-align: center;
+}
+
+.vehicle-enquire-icon {
+  font-size: 0.76rem;
+  font-weight: 700;
 }
 
 .vehicle-enquire-btn:hover {

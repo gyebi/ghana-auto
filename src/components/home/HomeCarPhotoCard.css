@@ -1,0 +1,35 @@
+.home-car-photo-card {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  background: #e8edf2;
+  box-shadow: 0 5px 20px rgba(16, 27, 43, 0.05);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.home-car-photo-card-image {
+  object-fit: contain;
+}
+
+.home-car-photo-card:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-car-photo-card:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 14px 35px rgba(16, 27, 43, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-car-photo-card {
+    transition: none;
+  }
+}

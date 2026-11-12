@@ -65,10 +65,6 @@ async function VehicleResults({ searchParams }) {
         </div>
       )}
 
-      <p className="cars-demo-notice">
-        Demonstration inventory — car details,
-        prices, and availability are fictional.
-      </p>
     </>
   );
 }

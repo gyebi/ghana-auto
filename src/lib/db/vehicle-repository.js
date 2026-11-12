@@ -57,6 +57,21 @@ export async function getPublicVehicles() {
   return vehicles.map(toPublicVehicle);
 }
 
+export async function getPublicHomepageVehicles() {
+  const prisma = getPrismaClient();
+  const vehicles = await prisma.vehicle.findMany({
+    where: publicVehicleWhere,
+    select: publicVehicleSelect,
+    orderBy: [
+      { featured: "desc" },
+      { createdAt: "desc" },
+    ],
+    take: 3,
+  });
+
+  return vehicles.map(toPublicVehicle);
+}
+
 export async function getPublicFeaturedVehicles() {
   const prisma = getPrismaClient();
   const vehicles = await prisma.vehicle.findMany({

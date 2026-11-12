@@ -1,6 +1,7 @@
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { getGeneralWhatsAppUrl } from "@/lib/whatsapp";
 import "./globals.css";
 
 export const metadata = {
@@ -10,11 +11,13 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const whatsAppHref = getGeneralWhatsAppUrl();
+
   return (
     <html lang="en">
       <body>
         <div className="site-wrapper">
-          <Header />
+          <Header whatsAppHref={whatsAppHref} />
           <main id="main-content">{children}</main>
           <Footer />
         </div>

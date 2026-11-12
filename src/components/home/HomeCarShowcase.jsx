@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import HomeCarPhotoCard from "@/components/home/HomeCarPhotoCard";
 import { getHomepagePhotoCardData } from "@/lib/homepage-photo";
 import { getPublicHomepageVehicles } from "@/lib/db/vehicle-repository";
@@ -37,6 +38,10 @@ export function HomeCarShowcaseFallback() {
 }
 
 export default async function HomeCarShowcase() {
+  // Keep the inventory query behind the page's Suspense boundary at request
+  // time. The homepage shell can still be prerendered without Neon credentials.
+  await connection();
+
   const vehicles = await getPublicHomepageVehicles();
   const photoVehicles = vehicles
     .map((vehicle) => {

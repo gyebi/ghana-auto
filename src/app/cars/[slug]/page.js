@@ -24,10 +24,6 @@ import "./vehicle-detail.css";
 
 export const metadata = {
   title: "Car Details | Ghana Auto",
-  robots: {
-    index: false,
-    follow: false,
-  },
 };
 
 async function VehicleDetailContent({ params }) {
@@ -204,11 +200,11 @@ async function VehicleDetailContent({ params }) {
               </Link>
             )}
             <VehicleShare title={title} />
-
-
             <p className="vehicle-detail-disclaimer">
-              Demonstration listing only. Prices, specifications,
-              and availability require confirmation.
+              Before purchasing, inspect the vehicle and confirm its condition,
+              final price, and availability with Ghana Auto. For import orders,
+              confirm shipping, clearing, duties, and any other import costs before
+              you proceed.
             </p>
           </div>
         </aside>

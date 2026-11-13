@@ -15,10 +15,6 @@ import "./cars.css";
 export const metadata = {
   title: "Browse Cars | Ghana Auto",
   description: "Explore available car listings at Ghana Auto.",
-  robots: {
-    index: false,
-    follow: false,
-  },
 };
 
 // This component runs when request parameters are available.

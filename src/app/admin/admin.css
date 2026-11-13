@@ -184,7 +184,7 @@
   font-size: clamp(1.6rem, 3vw, 2.2rem);
 }
 
-.admin-demo-label {
+.admin-context-label {
   padding: 8px 12px;
   background: #fff3d6;
   color: #8a5400;

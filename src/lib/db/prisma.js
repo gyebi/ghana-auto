@@ -4,8 +4,9 @@ import "server-only";
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// Reuse one Prisma instance during development
-// to avoid unnecessary database connection pools.
+// Reuse one Prisma instance per application process. This prevents every
+// repository call from opening another PostgreSQL pool in production while
+// still allowing each serverless instance to own its bounded pool.
 const globalForPrisma = globalThis;
 
 function createPrismaClient() {
@@ -35,11 +36,7 @@ export function getPrismaClient() {
     return globalForPrisma.ghanaAutoPrisma;
   }
 
-  const prisma = createPrismaClient();
+  globalForPrisma.ghanaAutoPrisma = createPrismaClient();
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.ghanaAutoPrisma = prisma;
-  }
-
-  return prisma;
+  return globalForPrisma.ghanaAutoPrisma;
 }

@@ -30,7 +30,7 @@ function EditVehicleContent({ vehicle, mode, notice }) {
             <p className="admin-eyebrow">ADMINISTRATION</p>
             <h1>{heading}</h1>
           </div>
-          <span className="admin-demo-label">Slug: {vehicle.slug}</span>
+          <span className="admin-context-label">Slug: {vehicle.slug}</span>
         </div>
         <section className="admin-panel">
           {notice && <p className="admin-success-message" role="status">Changes saved successfully.</p>}

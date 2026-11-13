@@ -50,3 +50,6 @@ jobs:
 
       - name: Build Next.js application
         run: npm run build
+
+      - name: Check diff whitespace
+        run: git diff --check

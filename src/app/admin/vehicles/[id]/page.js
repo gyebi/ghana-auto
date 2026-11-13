@@ -21,7 +21,7 @@ function VehicleReadOnlyContent({ vehicle }) {
       <div className="admin-main">
         <div className="admin-topbar">
           <div><p className="admin-eyebrow">ADMINISTRATION</p><h1>Car record</h1></div>
-          <span className="admin-demo-label">{vehicle.stockCode}</span>
+          <span className="admin-context-label">{vehicle.stockCode}</span>
         </div>
         <div className="admin-staff-bar"><span>Read-only historical inventory record</span><StaffSignOut /></div>
         <section className="admin-panel">

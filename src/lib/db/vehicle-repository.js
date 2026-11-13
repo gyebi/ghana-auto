@@ -43,6 +43,11 @@ const publicVehicleSelect = {
     },
   },
 };
+
+const publicVehicleSitemapSelect = {
+  slug: true,
+  updatedAt: true,
+};
 export async function getPublicVehicles() {
   const prisma = getPrismaClient();
   const vehicles = await prisma.vehicle.findMany({
@@ -104,6 +109,19 @@ export async function getPublicVehicleBySlug(slug) {
   });
 
   return toPublicVehicle(vehicle);
+}
+
+// Sitemap records use the same visibility predicate as the catalogue and
+// detail page. Never broaden this independently: unpublished, reserved, sold,
+// archived, and photo-less records must remain absent from public discovery.
+export async function getPublicVehicleSitemapEntries() {
+  const prisma = getPrismaClient();
+
+  return prisma.vehicle.findMany({
+    where: publicVehicleWhere,
+    select: publicVehicleSitemapSelect,
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getPrismaClient } from "./prisma.js";
+import { publicVehicleWhere } from "./public-vehicle-policy.mjs";
 
 export const ADMIN_VEHICLE_PAGE_SIZE = 25;
 const MAX_ADMIN_VEHICLE_PAGE = 10_000;
@@ -53,7 +54,7 @@ export function parseAdminVehicleListParams(searchParams) {
   const statusValue = getSingleQueryValue(searchParams?.status);
   const search =
     typeof searchValue === "string" &&
-    searchValue.length <= MAX_ADMIN_VEHICLE_SEARCH_LENGTH
+      searchValue.length <= MAX_ADMIN_VEHICLE_SEARCH_LENGTH
       ? searchValue.trim()
       : "";
 
@@ -112,4 +113,18 @@ export async function listAdminVehicles(searchParams) {
     totalPages: Math.ceil(total / ADMIN_VEHICLE_PAGE_SIZE),
     vehicles: vehicles.map(toAdminVehicle),
   };
+}
+
+export async function getAdminVehicleStatistics() {
+  const prisma = getPrismaClient();
+  const [total, publiclyAvailable, reserved, sold] = await prisma.$transaction([
+    prisma.vehicle.count(),
+    prisma.vehicle.count({
+      where: publicVehicleWhere,
+    }),
+    prisma.vehicle.count({ where: { status: "RESERVED" } }),
+    prisma.vehicle.count({ where: { status: "SOLD" } }),
+  ]);
+
+  return { total, publiclyAvailable, reserved, sold };
 }

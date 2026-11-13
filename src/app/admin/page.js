@@ -5,25 +5,26 @@ import { Suspense } from "react";
 import StaffLogin from "@/components/admin/StaffLogin";
 import StaffSignOut from "@/components/admin/StaffSignOut";
 import AdminNavigation from "@/components/admin/AdminNavigation";
-import { getCurrentStaffSession } from "@/lib/auth/staff-session";
+import { StaffAuthorizationError } from "@/lib/auth/staff-session";
+import { getAuthorizedAdminVehicleDashboard } from "@/lib/admin/vehicle-listing";
 import "./admin.css";
 
 export const metadata = {
-  title: "Admin Prototype | Ghana Auto",
+  title: "Administration | Ghana Auto",
   robots: {
     index: false,
     follow: false,
   },
 };
 
-const statistics = [
-  { label: "Total Cars", value: "32" },
-  { label: "Available Cars", value: "24" },
-  { label: "Sold Cars", value: "8" },
-  { label: "New Enquiries", value: "12" },
-];
+function AdminDashboard({ staffUser, statistics }) {
+  const dashboardStatistics = [
+    { label: "Total Cars", value: statistics.total },
+    { label: "Publicly Available", value: statistics.publiclyAvailable },
+    { label: "Reserved Cars", value: statistics.reserved },
+    { label: "Sold Cars", value: statistics.sold },
+  ];
 
-function AdminDashboard({ staffUser }) {
   return (
     <div className="admin-dashboard">
       <AdminNavigation activeSection="Dashboard" />
@@ -35,15 +36,12 @@ function AdminDashboard({ staffUser }) {
             <h1>Dashboard Overview</h1>
           </div>
 
-          <span className="admin-demo-label">
-            Demonstration data
-          </span>
+          <span className="admin-context-label">Live inventory</span>
         </div>
 
         <div className="admin-notice" role="note">
-          Dashboard statistics are demonstration data until live
-          administrative queries are implemented. Management
-          actions are not enabled in this checkpoint.
+          These counts are read from the current inventory. Availability means
+          a listing is published and publicly visible.
         </div>
 
         <div className="admin-staff-bar">
@@ -55,13 +53,12 @@ function AdminDashboard({ staffUser }) {
 
         <section
           className="admin-stat-grid"
-          aria-label="Sample dealership statistics"
+          aria-label="Live dealership statistics"
         >
-          {statistics.map((stat) => (
+          {dashboardStatistics.map((stat) => (
             <article key={stat.label} className="admin-stat-card">
               <p>{stat.label}</p>
               <strong>{stat.value}</strong>
-              <small>Sample data</small>
             </article>
           ))}
         </section>
@@ -79,12 +76,14 @@ function AdminDashboard({ staffUser }) {
 
           <div className="admin-empty-state">
             <span aria-hidden="true">🚘</span>
-            <h3>Inventory Management Coming Soon</h3>
+            <h3>Manage inventory</h3>
             <p>
-              Car listings will become manageable
-              once authentication and database integration
-              are completed.
+              Review listings, create drafts, and manage stock status in the
+              car inventory area.
             </p>
+            <Link href="/admin/vehicles" className="admin-vehicle-create-link">
+              Open Car Inventory
+            </Link>
           </div>
         </section>
       </div>
@@ -104,18 +103,22 @@ function AdminLoading() {
   );
 }
 
-async function AdminEntry() {
+async function getDashboardForRender() {
   // This is intentionally below Suspense: Cache Components requires the
   // request-time session check to stream rather than enter a shared shell.
-  // The helper rechecks Firebase revocation and Neon staff state on each
-  // protected render.
-  const session = await getCurrentStaffSession();
-
-  if (!session) {
-    return <StaffLogin />;
+  // The helper rechecks Firebase revocation and Neon staff state before it
+  // reads live inventory totals.
+  try {
+    return await getAuthorizedAdminVehicleDashboard();
+  } catch (error) {
+    if (error instanceof StaffAuthorizationError) return null;
+    throw error;
   }
+}
 
-  return <AdminDashboard staffUser={session.staffUser} />;
+async function AdminEntry() {
+  const dashboard = await getDashboardForRender();
+  return dashboard ? <AdminDashboard {...dashboard} /> : <StaffLogin />;
 }
 
 export default function AdminPage() {
